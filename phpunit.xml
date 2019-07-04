@@ -13,7 +13,7 @@
     </testsuite>
   </testsuites>
   <php>
-    <env name="SERVER_URL" value="http://192.168.99.100:8545"/>
+    <env name="SERVER_URL" value="https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e"/>
     <env name="NETWORK_ID" value="5777"/>
   </php>
 </phpunit>
