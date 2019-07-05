@@ -6,3 +6,25 @@
  * Time: 17:44
  */
 
+namespace Ethereum\Sandra;
+
+use SandraCore\System;
+
+class SandraBalance {
+
+
+
+    public function getSandra(){
+
+
+
+        $sandra = new System();
+
+
+
+
+    }
+
+
+
+}
