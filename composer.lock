@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "707142d7269d4dee7a1afb8959b6ab30",
+    "content-hash": "4e080ad87c0ddf4c74c36bd20745a7a6",
     "packages": [
         {
             "name": "digitaldonkey/ecverify",
@@ -735,12 +735,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/sandra.git",
-                "reference": "5855776e8eb9bf3c9db2b34841b1185b05e6fc07"
+                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/5855776e8eb9bf3c9db2b34841b1185b05e6fc07",
-                "reference": "5855776e8eb9bf3c9db2b34841b1185b05e6fc07",
+                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/4a0e881e7ba3df43e5c73152cbc76daaa6504351",
+                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351",
                 "shasum": ""
             },
             "require-dev": {
@@ -761,7 +761,7 @@
                 "MIT"
             ],
             "description": "Sandra Ontologic Datagraph",
-            "time": "2019-06-29T20:19:18+00:00"
+            "time": "2019-07-05T17:35:05+00:00"
         },
         {
             "name": "gossi/docblock",

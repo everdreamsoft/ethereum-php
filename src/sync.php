@@ -8,5 +8,8 @@
 
 namespace Ethereum;
 
+require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Composer autoload
+
+
 $myProcessor = new BlockProcessor();
-$myProcessor->trackContract();
+$myProcessor->trackContract(['0x5f5b176553e51171826d1a62e540bc30422c7717','0xa506758544a71943b5e8728d2DF8EC9E72473a9A']);

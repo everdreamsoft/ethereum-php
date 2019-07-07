@@ -35,5 +35,33 @@ class EthereumContract extends Entity
         parent::__construct($sandraConcept, $sandraReferencesArray, $factory, $entityId, $conceptVerb, $conceptTarget, $system);
     }
 
+    public function getAbi(){
+
+       $abiEntity = $this->getBrotherEntity(EthereumContractFactory::ABI_VERB,
+               EthereumContractFactory::ABI_TARGET);
+
+       if (!$abiEntity) return null ;
+
+      $abi =  $abiEntity->getStorage();
+
+       return $abi ;
+
+
+    }
+
+    public function setAbi($abi){
+
+        $abiEntity = $this->setBrotherEntity(EthereumContractFactory::ABI_VERB,
+           EthereumContractFactory::ABI_TARGET,null);
+
+        $abiEntity->setStorage($abi);
+
+        return $abi ;
+
+
+    }
+
+
+
 
 }
