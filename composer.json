@@ -8,7 +8,9 @@
 
     "pear/math_biginteger": "^1.0",
     "kornrunner/keccak": "^1.0",
-    "digitaldonkey/ecverify":"1.0"
+    "digitaldonkey/ecverify":"1.0",
+    "react/event-loop": "^1.0",
+    "react/stream": "^1.0"
   },
   "scripts": {
     "generate-methods": [
