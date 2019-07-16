@@ -21,6 +21,18 @@ use SandraCore\DatabaseAdapter;
 use SandraCore\EntityFactory;
 use SandraCore\System;
 
+
+class CallableEvents extends SmartContract {
+    public function onCalledTrigger1 (EthEvent $event) {
+        echo '### ' . substr(__FUNCTION__, 2) . "(\Ethereum\EmittedEvent)\n";
+        var_dump($event);
+    }
+    public function onCalledTrigger2 (EthEvent $event) {
+        echo '### ' . substr(__FUNCTION__, 2) . "(\Ethereum\EmittedEvent)\n";
+        var_dump($event);
+    }
+}
+
 class BlockProcessor
 {
 
@@ -126,7 +138,7 @@ class BlockProcessor
 
         $hosts = [
             // Start testrpc, geth or parity locally.
-            'https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e'
+            'https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e/'
         ];
 
         $contractFactory = new EthereumContractFactory($sandra);
@@ -137,19 +149,22 @@ class BlockProcessor
             /** @var EthereumContract $contract */
 
             $abi = json_decode($contract->getAbi(),1);
+            $contractAddress = $contract->get(EthereumContractFactory::IDENTIFIER);
+            echo "address is $contractAddress";
 
 
 
             try {
                 $web3 = new Ethereum('https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e');
                 $networkId = '5777';
-                $smartContract = new SmartContract($abi, '0x6ebeaf8e8e946f0716e6533a6f2cefc83f60e8ab', $web3);
+                $smartContract = new SmartContract($abi, $contractAddress, $web3);
                 $smartContracts[] = $smartContract ;
                 // By default ContractEventProcessor
                 // process any Transaction from Block-0 to latest Block (at script run time).
-                new ContractEventProcessor($web3, $smartContracts);
+               new ContractEventProcessor($web3, $smartContracts,30122);
             }
             catch (\Exception $exception) {
+                echo "abi should be"; $abi ;
                 throw new $exception;
             }
 
@@ -281,6 +296,8 @@ class BlockProcessor
         echo "<hr />";
 
     }
+
+
 
 
 

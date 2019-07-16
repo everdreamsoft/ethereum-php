@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f82eee6019496cbca085318003e0b88f",
+    "content-hash": "6bca2c166692c485fb02a9606db84fce",
     "packages": [
         {
             "name": "digitaldonkey/ecverify",
