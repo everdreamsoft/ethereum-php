@@ -9,9 +9,11 @@
 namespace Ethereum;
 
 
+use CsCannon\SandraManager;
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\FilterChange;
+use Ethereum\Eventlistener\BlockchainToDatagraph;
 use Ethereum\Eventlistener\ContractEventProcessor;
 use Ethereum\Sandra\EthereumContract;
 use Ethereum\Sandra\EthereumContractFactory;
@@ -40,7 +42,7 @@ class BlockProcessor
 
     public function trackContract($contract,$abiArray=null){
 
-        $sandra = new System('',true);
+        $sandra = SandraManager::getSandra();
 
         if (!is_array($contract)){
             $contractArray[] = $contract ;
@@ -129,7 +131,7 @@ class BlockProcessor
 
         // First we get tracked contracts
 
-        $sandra = new System('',true);
+        $sandra = SandraManager::getSandra();
 
         //
 
@@ -148,28 +150,39 @@ class BlockProcessor
 
             /** @var EthereumContract $contract */
 
-            $abi = json_decode($contract->getAbi(),1);
+            $abi = json_decode($contract->getAbi());
             $contractAddress = $contract->get(EthereumContractFactory::IDENTIFIER);
             echo "address is $contractAddress";
 
-
-
             try {
+
                 $web3 = new Ethereum('https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e');
-                $networkId = '5777';
                 $smartContract = new SmartContract($abi, $contractAddress, $web3);
-                $smartContracts[] = $smartContract ;
-                // By default ContractEventProcessor
-                // process any Transaction from Block-0 to latest Block (at script run time).
-               new ContractEventProcessor($web3, $smartContracts,30122);
+
+                $smartContracts[] = $smartContract;
             }
             catch (\Exception $exception) {
-                echo "abi should be"; $abi ;
+
                 throw new $exception;
             }
 
+            $abi = null ;
 
 
+        }
+
+        try {
+
+            $networkId = '5777';
+
+
+            // By default ContractEventProcessor
+            // process any Transaction from Block-0 to latest Block (at script run time).
+            new ContractEventProcessor($web3, $smartContracts,8159452);
+        }
+        catch (\Exception $exception) {
+
+            throw new $exception;
         }
 
 

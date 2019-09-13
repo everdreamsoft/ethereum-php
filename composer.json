@@ -10,7 +10,8 @@
     "kornrunner/keccak": "^1.0",
     "digitaldonkey/ecverify":"1.0",
     "react/event-loop": "^1.0",
-    "react/stream": "^1.0"
+    "react/stream": "^1.0",
+    "everdreamsoft/crystal-spark-cannon": "dev-master"
   },
   "scripts": {
     "generate-methods": [

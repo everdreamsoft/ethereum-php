@@ -36,19 +36,17 @@ class Event extends EthereumStatic
         $values = []; // Intermediate return value store
         $abiDecode = []; // Params we require to decode un-indexed data part.
         $return = []; // Final ordered return values.
-
         // Removing topic[0]. Topic[1-n] are indexed values.
-        $indexedValues = array_slice($filterChange->topics, 1);
-
+        $indexedValues = array_slice($filterChange->topics,1);
         foreach ($this->inputs as $i => $param) {
             if ($param->indexed) {
+                echo "$param->name \n";
                 $values[$param->name] = $indexedValues[$i]->convertByAbi($param->type);
             }
             else {
                 $abiDecode[] = $param;
             }
         }
-
         // Decode the Data part
         if (count($abiDecode)) {
             $decoded = Abi::decode($abiDecode, self::removeHexPrefix($filterChange->data->hexVal()));
@@ -56,7 +54,6 @@ class Event extends EthereumStatic
                 $values[$param->name] = $decoded[$i];
             }
         }
-
         // Restore array order (array_values($return) should return the right param order).
         foreach ($this->inputs as $i => $param) {
             $return[$param->name] = $values[$param->name];

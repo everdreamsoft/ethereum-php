@@ -7,6 +7,7 @@ use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\EthD20;
 use Ethereum\DataType\FilterChange;
 use \Ethereum\EmittedEvent;
+use PhpParser\Node\Expr\Array_;
 
 /**
  * %Ethereum SmartContract API for PHP.
@@ -97,19 +98,25 @@ class SmartContract
 
     /**
      * @param \Ethereum\DataType\FilterChange $filterChange
-     * @throws \Exception
-     *
+     * @param array $otherTrackedContracts
      * @return \Ethereum\EmittedEvent with emitted Data.
+     * @throws \Exception
      */
-    public function processLog(FilterChange $filterChange) {
+    public function processLog(FilterChange $filterChange, $otherTrackedContracts = null) {
 
         if ($filterChange->address->hexVal() !== $this->contractAddress) {
+
+            if (isset($otherTrackedContracts[$filterChange->address->hexVal()])){
+                $matchingContract = $otherTrackedContracts[$filterChange->address->hexVal()];
+                return $matchingContract->processLog($filterChange);
+
+            }
             return null;
         }
 
         if (is_array($filterChange->topics)) {
             $topic = $filterChange->topics[0]->hexVal();
-            if (isset($this->events[$topic])) {
+            if (isset($this->events[$topic])) { //todo investigate here
                 $transaction = $this->eth->eth_getTransactionByHash($filterChange->transactionHash);
                 // We have a relevant event.
                 $event = new EmittedEvent($this->events[$topic], $filterChange, $transaction);

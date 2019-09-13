@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6bca2c166692c485fb02a9606db84fce",
+    "content-hash": "d039403f73b4ed9a4ef931efb3a9dda6",
     "packages": [
         {
             "name": "digitaldonkey/ecverify",
@@ -89,6 +89,76 @@
                 "event-emitter"
             ],
             "time": "2017-07-23T21:35:13+00:00"
+        },
+        {
+            "name": "everdreamsoft/crystal-spark-cannon",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/everdreamsoft/CrystalSpark-Cannon.git",
+                "reference": "d7ce6cf3246a961f6de09969894c2d9b4e7a8fc2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/d7ce6cf3246a961f6de09969894c2d9b4e7a8fc2",
+                "reference": "d7ce6cf3246a961f6de09969894c2d9b4e7a8fc2",
+                "shasum": ""
+            },
+            "require": {
+                "everdreamsoft/sandra": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "CsCannon": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "shaban shaame",
+                    "email": "shaban@everdreamsoft.com"
+                }
+            ],
+            "description": "Syndicated interface for multiple blockchains",
+            "time": "2019-07-16T09:44:39+00:00"
+        },
+        {
+            "name": "everdreamsoft/sandra",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/everdreamsoft/sandra.git",
+                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/4a0e881e7ba3df43e5c73152cbc76daaa6504351",
+                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8"
+            },
+            "type": "project",
+            "autoload": {
+                "psr-0": {
+                    "SandraCore": "src/",
+                    "InnateSkills": "src/"
+                },
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Sandra Ontologic Datagraph",
+            "time": "2019-07-05T17:35:05+00:00"
         },
         {
             "name": "graze/guzzle-jsonrpc",
@@ -859,40 +929,6 @@
                 "instantiate"
             ],
             "time": "2019-03-17T17:37:11+00:00"
-        },
-        {
-            "name": "everdreamsoft/sandra",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/everdreamsoft/sandra.git",
-                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/4a0e881e7ba3df43e5c73152cbc76daaa6504351",
-                "reference": "4a0e881e7ba3df43e5c73152cbc76daaa6504351",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8"
-            },
-            "type": "project",
-            "autoload": {
-                "psr-0": {
-                    "SandraCore": "src/",
-                    "InnateSkills": "src/"
-                },
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Sandra Ontologic Datagraph",
-            "time": "2019-07-05T17:35:05+00:00"
         },
         {
             "name": "gossi/docblock",
@@ -2622,6 +2658,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "everdreamsoft/crystal-spark-cannon": 20,
         "everdreamsoft/sandra": 20
     },
     "prefer-stable": true,

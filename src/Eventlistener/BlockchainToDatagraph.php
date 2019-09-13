@@ -5,18 +5,22 @@ namespace Ethereum\Eventlistener;
 use CsCannon\AssetCollectionFactory;
 use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
 use CsCannon\Blockchains\Ethereum\EthereumBlockchain;
+use CsCannon\Blockchains\Ethereum\EthereumContractFactory;
 use CsCannon\Blockchains\Ethereum\EthereumEvent;
 use CsCannon\Blockchains\Ethereum\EthereumEventFactory;
+use CsCannon\SandraManager;
+use Ethereum\ApiConnector\RemoteFunctions;
 use \Ethereum\DataType\Block;
-use Ethereum\DataType\EthD32;
-use Ethereum\DataType\EthQ;
-use Ethereum\DataType\Transaction;
 use Ethereum\Ethereum;
+use Ethereum\SmartContract;
 
-class ContractEventProcessor extends BlockProcessor {
+class BlockchainToDatagraph extends BlockProcessor {
 
     /* @var \Ethereum\SmartContract[] $contracts */
     private $contracts;
+    private $knownContracts ;
+private $contractNoAbi;
+
 
     /**
      * BlockProcessor constructor.
@@ -68,50 +72,47 @@ class ContractEventProcessor extends BlockProcessor {
         $ethereumAddressFactory = new EthereumAddressFactory();
         //print_r($this->contracts);
 
+
+
         if (count($block->transactions)) {
+
+            echo 'This block has ' . count($block->transactions) . PHP_EOL;
             foreach ($block->transactions as $tx) {
 
-                /** @var Transaction $tx */
+                $destinationIsContract = false ;
 
-                //echo "tx =   \n".$tx->hash->val();
+                if (is_object($tx->to)) {
 
-                if ($tx->hash->val() == '00cb8f296775b4f14456b3d1b316327838fd3412104f8b341ff64344d1c8008d'){
+                    //is it a contract ?
 
-                    echo "we found the tx";
-                }
 
-                if (is_object($tx->to) && isset($this->contracts[$tx->to->hexVal()])) {
 
-                    $contract = $this->contracts[$tx->to->hexVal()];
                     $receipt = $this->web3->eth_getTransactionReceipt($tx->hash);
 
                     if (count($receipt->logs)) {
-                        foreach ($receipt->logs as $filterChange) {
-                            $event = $contract->processLog($filterChange,$this->contracts);
-                            if (is_null($event)) continue ;
+                        $destinationIsContract = true ;
 
-                            echo"processing".$event->getName(), "\n";
+                        $contract = $this->getContract($tx->to->hexVal());
+                        if (is_null($contract)) continue ;
+
+
+                        foreach ($receipt->logs as $filterChange) {
+                            $event = $contract->processLog($filterChange);
+                            if (is_null($event)) continue ;
+                            $me = new EthereumEventFactory();
+                            //
                               //  $assetCollection = new AssetCollectionFactory();
 
                             if ($event->hasData() && $event->getName() == 'Transfer') {
-                                echo"Transfer found".$event->getName(), "\n";
                                 //$me->create(EthereumBlockchain::class,)
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
 
-                                $from = $eventData['_from']->hexval();
-                                $to = $eventData['_to']->hexval();
+                                $from = $eventData['from']->hexval();
 
 
 
-                                $tokenId = $eventData['_tokenId'] ;
-                                //ETHQ
-                                /** @var EthQ $tokenId */
-                                $tokenId->val();
-
-
-
-                                echo"hello Transfer $from to $to with token ID = ".$tokenId->val()."\n";
+                                echo"hello Transfer $from";
                             }
                         }
                     }
@@ -133,6 +134,62 @@ class ContractEventProcessor extends BlockProcessor {
             unset($contracts[$i]);
         }
         return $contracts;
+    }
+
+
+    private  function getContract($contract){
+
+        if (isset( $this->knownContracts[$contract])){
+        return $this->knownContracts[$contract]['object'] ;
+        }
+
+        if (isset( $this->contractNoAbi[$contract])){
+            null ;
+        }
+
+        $sandra = SandraManager::getSandra();
+
+        $contractFactory = new \Ethereum\Sandra\EthereumContractFactory($sandra);
+       $sandraContract =  $contractFactory->get($contract);
+
+       if (is_null($sandraContract)) $sandraContract = $contractFactory->create($contract,null);
+
+       $abi = $sandraContract->getAbi() ;
+
+       if (is_null($abi)){
+
+
+           $abi = RemoteFunctions::getAbi($contract);
+           $sandraContract->setAbi($abi);
+
+           echo "Got ABI for $contract \n";
+       }
+
+       if (!$abi) return null ;
+
+
+        if (!is_array($abi)){
+            if($abi = json_decode($abi,1));
+            else {
+                $this->contractNoAbi[$contract] = 1 ;
+                return  null ;
+            }
+        }
+
+        echo "working on contract $contract \n";
+
+        try {
+            $smartContract = new SmartContract($abi, $contract, $this->web3);
+        } catch (\Exception $e) {
+        }
+
+
+        $this->knownContracts[$contract]['object'] = $smartContract;
+
+       return $smartContract ;
+
+
+
     }
 
 }

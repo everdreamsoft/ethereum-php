@@ -78,6 +78,9 @@ public function populateLocal($limit = 10000, $offset = 0, $asc = 'ASC')
         $dataArray[self::IDENTIFIER] = $address;
 
         $entity = parent::createNew($dataArray, null);
+
+        if (!$abi) return $entity ;
+
         $abiEntity = $entity->setBrotherEntity(self::ABI_VERB,self::ABI_TARGET,null);
         $abiEntity->setStorage($abi);
 
