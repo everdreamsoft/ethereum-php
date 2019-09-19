@@ -20,10 +20,9 @@ $sandra = SandraManager::getSandra();
 
 //Setup::flushDatagraph($sandra);
 
-$sandra = SandraManager::getSandra();
 
 
-$trackedContractArray[] = '0x0777f76d195795268388789343068e4fcd286919'; // GU pack of four
+$trackedContractArray[] = '0xc82c13004c06E4c627cF2518612A55CE7a3Db699'; // GU pack of four
 /*$trackedContractArray[] = '0x6ebeaf8e8e946f0716e6533a6f2cefc83f60e8ab'; // GU token contract
 $trackedContractArray[] = '0x6e0051c750b81f583f42f93a48d56497779992d8'; // GU EpicPack
 $trackedContractArray[] = '0x5789e2b5460cae9329d93a78511e2ac49f98a1f6'; // GU LegendaryPack
@@ -48,6 +47,11 @@ $trackedContractArray[] = '0x6Cb4AD504816bD3021aE48286f018AC725239B89'; // GU Ca
 $trackedContractArray[] = '0x6EbeAf8e8E946F0716E6533A6f2cefc83f60e8Ab'; // GU CardMigration */
 
 $myProcessor->trackContract($trackedContractArray);
+
+echo"tracked :";
+print_r($trackedContractArray);
+
+echo "processing";
 
 
 

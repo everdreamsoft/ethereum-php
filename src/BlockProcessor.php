@@ -80,14 +80,12 @@ class BlockProcessor
 
                $client = new Client();
                try {
-                   $res = $client->request('GET', 'https://api.etherscan.io/api?module=contract&action=getabi&address=' . $contractAddress . '');
-                   echo 'https://api.etherscan.io/api?module=contract&action=getabi
-                &address=' . $contractAddress . '';
+                   $strJsonFileContents = file_get_contents("test/abi.json");
 
 
 
-                   $result = json_decode($res->getBody());
-                   $abiRaw = $result->result ;
+                   $result = json_decode($strJsonFileContents);
+                   $abiRaw = $result->abi ;
                    $abiRefined = $abiRaw;
                    $abi = $abiRefined;
                    $saveAbi = $abiRefined;
@@ -111,7 +109,7 @@ class BlockProcessor
 
           if ($abi){
 
-              $contractEntity->setAbi($saveAbi);
+              $contractEntity->setAbi($strJsonFileContents);
           }
 
 
@@ -140,7 +138,7 @@ class BlockProcessor
 
         $hosts = [
             // Start testrpc, geth or parity locally.
-            'https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e/'
+            'https://testnet2.matic.network'
         ];
 
         $contractFactory = new EthereumContractFactory($sandra);
@@ -156,7 +154,7 @@ class BlockProcessor
 
             try {
 
-                $web3 = new Ethereum('https://mainnet.infura.io/v3/a6e34ed067c74f25ba705456d73a471e');
+                $web3 = new Ethereum('https://testnet2.matic.network');
                 $smartContract = new SmartContract($abi, $contractAddress, $web3);
 
                 $smartContracts[] = $smartContract;
