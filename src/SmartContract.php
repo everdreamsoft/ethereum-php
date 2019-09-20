@@ -104,7 +104,7 @@ class SmartContract
      */
     public function processLog(FilterChange $filterChange, $otherTrackedContracts = null) {
 
-        if ($filterChange->address->hexVal() !== $this->contractAddress) {
+        if ($filterChange->address->hexVal() !== strtolower($this->contractAddress)) {
 
             if (isset($otherTrackedContracts[$filterChange->address->hexVal()])){
                 $matchingContract = $otherTrackedContracts[$filterChange->address->hexVal()];

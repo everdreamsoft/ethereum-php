@@ -20,6 +20,8 @@ $sandra = SandraManager::getSandra();
 
 //Setup::flushDatagraph($sandra);
 
+$sandra = SandraManager::getSandra();
+
 
 
 $trackedContractArray[] = '0xc82c13004c06E4c627cF2518612A55CE7a3Db699'; // GU pack of four

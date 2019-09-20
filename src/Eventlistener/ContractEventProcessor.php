@@ -99,19 +99,34 @@ class ContractEventProcessor extends BlockProcessor {
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
 
-                                $from = $eventData['_from']->hexval();
-                                $to = $eventData['_to']->hexval();
+                                if (isset ( $eventData['_from'])){
+                                    $from = $eventData['_from']->hexval();
+                                    $to = $eventData['_to']->hexval();
+
+                                }
+
+                                if (isset ( $eventData['from'])){
+                                    $from = $eventData['from']->hexval();
+                                    $to = $eventData['to']->hexval();
+
+                                }
 
 
 
-                                $tokenId = $eventData['_tokenId'] ;
+                                echo"hello Transfer $from to $to ";
+
+
                                 //ETHQ
                                 /** @var EthQ $tokenId */
-                                $tokenId->val();
+                                if (isset($eventData['_tokenId'])) {
+                                    $tokenId = $eventData['_tokenId'] ;
+                                    $tokenIdString = $tokenId->val();
+                                   echo" with token ID = ".$tokenIdString."\n";
+                                }
 
 
 
-                                echo"hello Transfer $from to $to with token ID = ".$tokenId->val()."\n";
+
                             }
                         }
                     }
@@ -129,7 +144,7 @@ class ContractEventProcessor extends BlockProcessor {
 
         foreach ($contracts as $i => $c) {
             /* @var \Ethereum\SmartContract $c */
-            $contracts[$c->getAddress()] = $c;
+            $contracts[strtolower($c->getAddress())] = $c;
             unset($contracts[$i]);
         }
         return $contracts;

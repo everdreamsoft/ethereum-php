@@ -109,7 +109,7 @@ class BlockProcessor
 
           if ($abi){
 
-              $contractEntity->setAbi($strJsonFileContents);
+              $contractEntity->setAbi(json_encode($saveAbi));
           }
 
 
@@ -176,7 +176,7 @@ class BlockProcessor
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            new ContractEventProcessor($web3, $smartContracts,8159452);
+            new ContractEventProcessor($web3, $smartContracts,7818361);
         }
         catch (\Exception $exception) {
 
