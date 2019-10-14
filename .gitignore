@@ -5,6 +5,7 @@ TRASH
 docs
 doc
 *generatedTest.php
+public
 
 !docs/.gitkeep
 
