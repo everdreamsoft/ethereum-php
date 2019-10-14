@@ -3,15 +3,20 @@
 namespace Ethereum\Eventlistener;
 
 use CsCannon\AssetCollectionFactory;
+use CsCannon\Blockchains\BlockchainBlock;
+use CsCannon\Blockchains\BlockchainBlockFactory;
+use CsCannon\Blockchains\BlockchainEventFactory;
 use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
 use CsCannon\Blockchains\Ethereum\EthereumBlockchain;
 use CsCannon\Blockchains\Ethereum\EthereumEvent;
 use CsCannon\Blockchains\Ethereum\EthereumEventFactory;
+use CsCannon\SandraManager;
 use \Ethereum\DataType\Block;
 use Ethereum\DataType\EthD32;
 use Ethereum\DataType\EthQ;
 use Ethereum\DataType\Transaction;
 use Ethereum\Ethereum;
+use Ethereum\Sandra\EthereumContractFactory;
 
 class ContractEventProcessor extends BlockProcessor {
 
@@ -73,13 +78,6 @@ class ContractEventProcessor extends BlockProcessor {
 
                 /** @var Transaction $tx */
 
-                //echo "tx =   \n".$tx->hash->val();
-
-                if ($tx->hash->val() == '00cb8f296775b4f14456b3d1b316327838fd3412104f8b341ff64344d1c8008d'){
-
-                    echo "we found the tx";
-                }
-
                 if (is_object($tx->to) && isset($this->contracts[$tx->to->hexVal()])) {
 
                     $contract = $this->contracts[$tx->to->hexVal()];
@@ -98,18 +96,44 @@ class ContractEventProcessor extends BlockProcessor {
                                 //$me->create(EthereumBlockchain::class,)
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
+                                $ethereumAddressFactory = new EthereumAddressFactory();
 
                                 if (isset ( $eventData['_from'])){
                                     $from = $eventData['_from']->hexval();
                                     $to = $eventData['_to']->hexval();
+                                    $fromEntity =  $ethereumAddressFactory->get($from,true);
+                                    $toEntity = $ethereumAddressFactory->get($to,true);
 
                                 }
 
                                 if (isset ( $eventData['from'])){
                                     $from = $eventData['from']->hexval();
                                     $to = $eventData['to']->hexval();
+                                    $fromEntity =  $ethereumAddressFactory->get($from,true);
+                                    $toEntity = $ethereumAddressFactory->get($to,true);
 
                                 }
+                                $quantity = null ;
+
+                                if (isset ( $eventData['value'])){
+                                    $quantity = $eventData['value']->val();
+
+
+                                }
+
+
+                                $blockId = $block->number->val();
+                                $blockFactory = new BlockchainBlockFactory(new EthereumBlockchain());
+                                $sandraBlock = $blockFactory->getOrCreateFromRef(BlockchainBlockFactory::INDEX_SHORTNAME,$blockId);
+
+
+
+
+                                $ethereumEventFactory = new EthereumEventFactory();
+                                $ethereumContractFactory = new EthereumContractFactory(SandraManager::getSandra());
+                                $sandraContract = $ethereumContractFactory->get($contract->getAddress());
+                                $ethereumEventFactory->create(new EthereumBlockchain(),$fromEntity,$toEntity,$sandraContract,$tx->hash->val(),
+                                 $block->timestamp->val(),$sandraBlock,null,$quantity );
 
 
 
@@ -121,7 +145,7 @@ class ContractEventProcessor extends BlockProcessor {
                                 if (isset($eventData['_tokenId'])) {
                                     $tokenId = $eventData['_tokenId'] ;
                                     $tokenIdString = $tokenId->val();
-                                   echo" with token ID = ".$tokenIdString."\n";
+                                    echo" with token ID = ".$tokenIdString."\n";
                                 }
 
 

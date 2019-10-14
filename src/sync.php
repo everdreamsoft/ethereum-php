@@ -24,11 +24,11 @@ $sandra = SandraManager::getSandra();
 
 
 
-$trackedContractArray[] = '0xc82c13004c06E4c627cF2518612A55CE7a3Db699'; // GU pack of four
-/*$trackedContractArray[] = '0x6ebeaf8e8e946f0716e6533a6f2cefc83f60e8ab'; // GU token contract
-$trackedContractArray[] = '0x6e0051c750b81f583f42f93a48d56497779992d8'; // GU EpicPack
-$trackedContractArray[] = '0x5789e2b5460cae9329d93a78511e2ac49f98a1f6'; // GU LegendaryPack
-$trackedContractArray[] = '0x000983ba1a675327f0940b56c2d49cd9c042dfbf'; // GU ShinyLegendaryPack
+$trackedContractArray[] = '0x753fc3b652ed31ec02345cf46782d080843837b5'; // my first klaytn token
+$trackedContractArray[] = '0xB2c48D6384feA29283b51622f179dC51ffB178E0'; // Settler bunny
+$trackedContractArray[] = '0x53Dd98cA4B63178841155fCd80d4C4Ca7D5Ba331'; // Settler Salamender
+$trackedContractArray[] = '0x7cDB98E90441DC2040B7a1627a1335D99B4C3859'; // Settler Horse
+/*$trackedContractArray[] = '0x000983ba1a675327f0940b56c2d49cd9c042dfbf'; // GU ShinyLegendaryPack
 $trackedContractArray[] = '0xe7e02be77d46ca4def893d1d05198f4be5c1ecd8'; // GU Vault
 $trackedContractArray[] = '0x91b9d2835ad914bc1dcfe09bd1816febd04fd689'; // GU Capped vault
 $trackedContractArray[] = '0xe7e02be77d46ca4def893d1d05198f4be5c1ecd8'; // GU Vault

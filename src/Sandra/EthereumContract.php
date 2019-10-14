@@ -20,7 +20,7 @@ use SandraCore\Entity;
 use SandraCore\ForeignEntityAdapter;
 use SandraCore\System;
 
-class EthereumContract extends Entity
+class EthereumContract extends \CsCannon\Blockchains\Ethereum\EthereumContract
 {
 
     protected static $isa = 'ethContract';

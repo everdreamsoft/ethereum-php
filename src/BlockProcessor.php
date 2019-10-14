@@ -57,7 +57,7 @@ class BlockProcessor
 
 
       //we search matching addressses
-        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get($contractFactory::IDENTIFIER),$sandra,'',$sandra->systemConcept->get(EthereumContractFactory::$file));
+        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get($contractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(EthereumContractFactory::$file));
         $contractFactory->conceptArray = $conceptsArray ;//we preload the factory with found concepts
 
         $contractFactory->populateLocal();
@@ -85,10 +85,11 @@ class BlockProcessor
 
 
                    $result = json_decode($strJsonFileContents);
-                   $abiRaw = $result->abi ;
-                   $abiRefined = $abiRaw;
-                   $abi = $abiRefined;
-                   $saveAbi = $abiRefined;
+                   //$abiRaw = $result->abi ;
+                   //$abiRefined = $abiRaw;
+                   //$abi = $abiRefined;
+                   $saveAbi = $result;
+                   $abi = $result; //Carefulo here on the format
 
                   // $abi = stripslashes($abi);
                } catch (ClientException  $e) {
@@ -98,7 +99,7 @@ class BlockProcessor
            }
 
 
-          $contractEntity = $contractFactory->get($contractAddress);
+          $contractEntity = $contractFactory->get($contractAddress,true);
 
           if (!$contractEntity){
 
@@ -109,7 +110,7 @@ class BlockProcessor
 
           if ($abi){
 
-              $contractEntity->setAbi(json_encode($saveAbi));
+              $contractEntity->setAbi(json_encode($result));
           }
 
 
@@ -138,7 +139,7 @@ class BlockProcessor
 
         $hosts = [
             // Start testrpc, geth or parity locally.
-            'https://testnet2.matic.network'
+            'https://api.baobab.klaytn.net:8651/'
         ];
 
         $contractFactory = new EthereumContractFactory($sandra);
@@ -149,12 +150,12 @@ class BlockProcessor
             /** @var EthereumContract $contract */
 
             $abi = json_decode($contract->getAbi());
-            $contractAddress = $contract->get(EthereumContractFactory::IDENTIFIER);
+            $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
             echo "address is $contractAddress";
 
             try {
 
-                $web3 = new Ethereum('https://testnet2.matic.network');
+                $web3 = new Ethereum('https://api.baobab.klaytn.net:8651/');
                 $smartContract = new SmartContract($abi, $contractAddress, $web3);
 
                 $smartContracts[] = $smartContract;
@@ -176,7 +177,7 @@ class BlockProcessor
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            new ContractEventProcessor($web3, $smartContracts,7818361);
+            new ContractEventProcessor($web3, $smartContracts,9478756);
         }
         catch (\Exception $exception) {
 
@@ -197,6 +198,182 @@ class BlockProcessor
         try {
             echo "<h3>What's up on $url</h3>";
             $eth = new Ethereum($url);
+
+            $abi =json_decode("[
+	{
+		\"constant\": false,
+		\"inputs\": [
+			{
+				\"name\": \"spender\",
+				\"type\": \"address\"
+			},
+			{
+				\"name\": \"amount\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"name\": \"approve\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"bool\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"nonpayable\",
+		\"type\": \"function\"
+	},
+	{
+		\"constant\": true,
+		\"inputs\": [],
+		\"name\": \"totalSupply\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"view\",
+		\"type\": \"function\"
+	},
+	{
+		\"constant\": false,
+		\"inputs\": [
+			{
+				\"name\": \"sender\",
+				\"type\": \"address\"
+			},
+			{
+				\"name\": \"recipient\",
+				\"type\": \"address\"
+			},
+			{
+				\"name\": \"amount\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"name\": \"transferFrom\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"bool\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"nonpayable\",
+		\"type\": \"function\"
+	},
+	{
+		\"constant\": true,
+		\"inputs\": [
+			{
+				\"name\": \"account\",
+				\"type\": \"address\"
+			}
+		],
+		\"name\": \"balanceOf\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"view\",
+		\"type\": \"function\"
+	},
+	{
+		\"constant\": false,
+		\"inputs\": [
+			{
+				\"name\": \"recipient\",
+				\"type\": \"address\"
+			},
+			{
+				\"name\": \"amount\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"name\": \"transfer\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"bool\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"nonpayable\",
+		\"type\": \"function\"
+	},
+	{
+		\"constant\": true,
+		\"inputs\": [
+			{
+				\"name\": \"owner\",
+				\"type\": \"address\"
+			},
+			{
+				\"name\": \"spender\",
+				\"type\": \"address\"
+			}
+		],
+		\"name\": \"allowance\",
+		\"outputs\": [
+			{
+				\"name\": \"\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"payable\": false,
+		\"stateMutability\": \"view\",
+		\"type\": \"function\"
+	},
+	{
+		\"anonymous\": false,
+		\"inputs\": [
+			{
+				\"indexed\": true,
+				\"name\": \"from\",
+				\"type\": \"address\"
+			},
+			{
+				\"indexed\": true,
+				\"name\": \"to\",
+				\"type\": \"address\"
+			},
+			{
+				\"indexed\": false,
+				\"name\": \"value\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"name\": \"Transfer\",
+		\"type\": \"event\"
+	},
+	{
+		\"anonymous\": false,
+		\"inputs\": [
+			{
+				\"indexed\": true,
+				\"name\": \"owner\",
+				\"type\": \"address\"
+			},
+			{
+				\"indexed\": true,
+				\"name\": \"spender\",
+				\"type\": \"address\"
+			},
+			{
+				\"indexed\": false,
+				\"name\": \"value\",
+				\"type\": \"uint256\"
+			}
+		],
+		\"name\": \"Approval\",
+		\"type\": \"event\"
+	}
+]");
 
 
             $contract = new SmartContract($abi, '0x6ebeaf8e8e946f0716e6533a6f2cefc83f60e8ab', $eth);
