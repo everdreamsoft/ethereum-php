@@ -80,128 +80,9 @@ class BlockProcessor
 
                $client = new Client();
                try {
-                   $strJsonFileContents = file_get_contents("test/abi.json");
-
-
-
-                   $result = json_decode($strJsonFileContents);
-                   //$abiRaw = $result->abi ;
-                   //$abiRefined = $abiRaw;
-                   //$abi = $abiRefined;
-                   $saveAbi = $result;
-                   $abi = $result; //Carefulo here on the format
-
-                  // $abi = stripslashes($abi);
-               } catch (ClientException  $e) {
-                   $abi = null;
-
-               }
-           }
-
-
-          $contractEntity = $contractFactory->get($contractAddress,true);
-
-          if (!$contractEntity){
-
-
-              $contractEntity = $contractFactory->create($contractAddress,$abi,true);
-
-          }
-
-          if ($abi){
-
-              $contractEntity->setAbi(json_encode($result));
-          }
-
-
-
-
-       }
-
-
-
-
-
-
-
-    }
-
-    public function process(){
-
-        // First we get tracked contracts
-
-        $sandra = SandraManager::getSandra();
-
-        //
-
-
-        //Then we process blocks from the lowest block of those contracts
-
-        $hosts = [
-            // Start testrpc, geth or parity locally.
-            'https://api.baobab.klaytn.net:8651/'
-        ];
-
-        $contractFactory = new EthereumContractFactory($sandra);
-        $contractFactory->populateLocal();
-
-        foreach ($contractFactory->entityArray as $contract ){
-
-            /** @var EthereumContract $contract */
-
-            $abi = json_decode($contract->getAbi());
-            $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
-            echo "address is $contractAddress";
-
-            try {
-
-                $web3 = new Ethereum('https://api.baobab.klaytn.net:8651/');
-                $smartContract = new SmartContract($abi, $contractAddress, $web3);
-
-                $smartContracts[] = $smartContract;
-            }
-            catch (\Exception $exception) {
-
-                throw new $exception;
-            }
-
-            $abi = null ;
-
-
-        }
-
-        try {
-
-            $networkId = '5777';
-
-
-            // By default ContractEventProcessor
-            // process any Transaction from Block-0 to latest Block (at script run time).
-            new ContractEventProcessor($web3, $smartContracts,9478756);
-        }
-        catch (\Exception $exception) {
-
-            throw new $exception;
-        }
-
-
-
-
-
-
-
-
-        }
-
-    public function getEvents(){
-
-        try {
-            echo "<h3>What's up on $url</h3>";
-            $eth = new Ethereum($url);
-
-            $abi =json_decode("[
+                   $strJsonFileContents = "[
 	{
-		\"constant\": false,
+        \"constant\": false,
 		\"inputs\": [
 			{
 				\"name\": \"spender\",
@@ -373,7 +254,126 @@ class BlockProcessor
 		\"name\": \"Approval\",
 		\"type\": \"event\"
 	}
-]");
+]";
+
+
+
+                   $result = json_decode($strJsonFileContents);
+                   //$abiRaw = $result->abi ;
+                   //$abiRefined = $abiRaw;
+                   //$abi = $abiRefined;
+                   $saveAbi = $result;
+                   $abi = $result; //Carefulo here on the format
+
+                  // $abi = stripslashes($abi);
+               } catch (ClientException  $e) {
+                   $abi = null;
+
+               }
+           }
+
+
+          $contractEntity = $contractFactory->get($contractAddress,true);
+
+          if (!$contractEntity){
+
+
+              $contractEntity = $contractFactory->create($contractAddress,$abi,true);
+
+          }
+
+          if ($abi){
+
+              $contractEntity->setAbi(json_encode($result));
+          }
+
+
+
+
+       }
+
+
+
+
+
+
+
+    }
+
+    public function process(){
+
+        // First we get tracked contracts
+
+        $sandra = SandraManager::getSandra();
+
+        //
+
+
+        //Then we process blocks from the lowest block of those contracts
+
+        $hosts = [
+            // Start testrpc, geth or parity locally.
+            'https://api.baobab.klaytn.net:8651/'
+        ];
+
+        $contractFactory = new EthereumContractFactory($sandra);
+        $contractFactory->populateLocal();
+
+        foreach ($contractFactory->entityArray as $contract ){
+
+            /** @var EthereumContract $contract */
+
+            $abi = json_decode($contract->getAbi());
+            $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
+            echo "address is $contractAddress";
+
+            try {
+
+                $web3 = new Ethereum('https://api.baobab.klaytn.net:8651/');
+                $smartContract = new SmartContract($abi, $contractAddress, $web3);
+
+                $smartContracts[] = $smartContract;
+            }
+            catch (\Exception $exception) {
+
+                throw new $exception;
+            }
+
+            $abi = null ;
+
+
+        }
+
+        try {
+
+            $networkId = '5777';
+
+
+            // By default ContractEventProcessor
+            // process any Transaction from Block-0 to latest Block (at script run time).
+            new ContractEventProcessor($web3, $smartContracts,9478756);
+        }
+        catch (\Exception $exception) {
+
+            throw new $exception;
+        }
+
+
+
+
+
+
+
+
+        }
+
+    public function getEvents(){
+
+        try {
+            echo "<h3>What's up on $url</h3>";
+            $eth = new Ethereum($url);
+
+            $abi =json_decode("");
 
 
             $contract = new SmartContract($abi, '0x6ebeaf8e8e946f0716e6533a6f2cefc83f60e8ab', $eth);
