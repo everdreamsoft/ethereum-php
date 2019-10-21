@@ -9,7 +9,11 @@
 namespace Ethereum;
 
 
+use CsCannon\Blockchains\BlockchainContractFactory;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
+use CsCannon\Blockchains\RpcProvider;
 use CsCannon\SandraManager;
+
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\FilterChange;
@@ -38,6 +42,17 @@ class CallableEvents extends SmartContract {
 class BlockProcessor
 {
 
+    public $rpcProvider = null ;
+    public $fromBlockNumber = null ;
+
+    public function __construct(RpcProvider $provider, $fromBlockNumber = 0)
+    {
+
+        $this->rpcProvider = $provider ;
+        $this->fromBlockNumber = $fromBlockNumber ;
+
+
+    }
 
 
     public function trackContract($contract,$abiArray=null){
@@ -51,13 +66,15 @@ class BlockProcessor
             $contractArray = $contract ;
         }
 
-        $contractFactory = new EthereumContractFactory($sandra);
+        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
 
-        print_r($contractArray);
+       // $contractFactory = new EthereumContractFactory();
+
+        //print_r($contractArray);
 
 
       //we search matching addressses
-        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get($contractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(EthereumContractFactory::$file));
+        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(BlockchainContractFactory::$file));
         $contractFactory->conceptArray = $conceptsArray ;//we preload the factory with found concepts
 
         $contractFactory->populateLocal();
@@ -259,11 +276,10 @@ class BlockProcessor
 
 
                    $result = json_decode($strJsonFileContents);
-                   //$abiRaw = $result->abi ;
-                   //$abiRefined = $abiRaw;
-                   //$abi = $abiRefined;
-                   $saveAbi = $result;
-                   $abi = $result; //Carefulo here on the format
+                   $abiRaw = $result->abi ;
+                   $abiRefined = $abiRaw;
+                   $abi = $abiRefined;
+                   $saveAbi = $abiRefined;
 
                   // $abi = stripslashes($abi);
                } catch (ClientException  $e) {
@@ -273,18 +289,19 @@ class BlockProcessor
            }
 
 
-          $contractEntity = $contractFactory->get($contractAddress,true);
+          $contractEntity = $contractFactory->get($contractAddress,true,ERC20::init());
 
           if (!$contractEntity){
 
 
-              $contractEntity = $contractFactory->create($contractAddress,$abi,true);
+              $contractEntity = $contractFactory->create($contractAddress,true);
+              $contractEntity->setAbi($saveAbi);
 
           }
 
           if ($abi){
 
-              $contractEntity->setAbi(json_encode($result));
+              $contractEntity->setAbi(json_encode($saveAbi));
           }
 
 
@@ -313,10 +330,10 @@ class BlockProcessor
 
         $hosts = [
             // Start testrpc, geth or parity locally.
-            'https://api.baobab.klaytn.net:8651/'
+            'https://testnet2.matic.network'
         ];
 
-        $contractFactory = new EthereumContractFactory($sandra);
+        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
         $contractFactory->populateLocal();
 
         foreach ($contractFactory->entityArray as $contract ){
@@ -329,7 +346,7 @@ class BlockProcessor
 
             try {
 
-                $web3 = new Ethereum('https://api.baobab.klaytn.net:8651/');
+                $web3 = new Ethereum($this->rpcProvider->getHostUrl());
                 $smartContract = new SmartContract($abi, $contractAddress, $web3);
 
                 $smartContracts[] = $smartContract;
