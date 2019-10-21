@@ -44,12 +44,14 @@ class BlockProcessor
 
     public $rpcProvider = null ;
     public $fromBlockNumber = null ;
+    public $sandra = null ;
 
-    public function __construct(RpcProvider $provider, $fromBlockNumber = 0)
+    public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
 
         $this->rpcProvider = $provider ;
         $this->fromBlockNumber = $fromBlockNumber ;
+        SandraManager::setSandra($sandra);
 
 
     }
@@ -68,12 +70,12 @@ class BlockProcessor
 
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
 
-       // $contractFactory = new EthereumContractFactory();
+        // $contractFactory = new EthereumContractFactory();
 
         //print_r($contractArray);
 
 
-      //we search matching addressses
+        //we search matching addressses
         $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(BlockchainContractFactory::$file));
         $contractFactory->conceptArray = $conceptsArray ;//we preload the factory with found concepts
 
@@ -81,23 +83,23 @@ class BlockProcessor
 
 
 
-       foreach ($contractArray as $index => $contractAddress){
+        foreach ($contractArray as $index => $contractAddress){
 
-           $abi = null ;
+            $abi = null ;
             //do we have a related abi
-           if(is_array($abiArray)){
-               if (isset ($abiArray[$index])){
+            if(is_array($abiArray)){
+                if (isset ($abiArray[$index])){
 
-                   $abi = $abiArray[$index] ;
-               }
+                    $abi = $abiArray[$index] ;
+                }
 
-           }
-           //we will look for the abi in etherscan
-           if (!$abi) {
+            }
+            //we will look for the abi in etherscan
+            if (!$abi) {
 
-               $client = new Client();
-               try {
-                   $strJsonFileContents = "[
+                $client = new Client();
+                try {
+                    $strJsonFileContents = "[
 	{
         \"constant\": false,
 		\"inputs\": [
@@ -275,39 +277,39 @@ class BlockProcessor
 
 
 
-                   $result = json_decode($strJsonFileContents);
-                   $abiRaw = $result->abi ;
-                   $abiRefined = $abiRaw;
-                   $abi = $abiRefined;
-                   $saveAbi = $abiRefined;
+                    $result = json_decode($strJsonFileContents);
+                    $abiRaw = $result ;
+                    $abiRefined = $abiRaw;
+                    $abi = $abiRefined;
+                    $saveAbi = $abiRefined;
 
-                  // $abi = stripslashes($abi);
-               } catch (ClientException  $e) {
-                   $abi = null;
+                    // $abi = stripslashes($abi);
+                } catch (ClientException  $e) {
+                    $abi = null;
 
-               }
-           }
-
-
-          $contractEntity = $contractFactory->get($contractAddress,true,ERC20::init());
-
-          if (!$contractEntity){
+                }
+            }
 
 
-              $contractEntity = $contractFactory->create($contractAddress,true);
-              $contractEntity->setAbi($saveAbi);
+            $contractEntity = $contractFactory->get($contractAddress,true,ERC20::init());
 
-          }
-
-          if ($abi){
-
-              $contractEntity->setAbi(json_encode($saveAbi));
-          }
+            if (!$contractEntity){
 
 
+                $contractEntity = $contractFactory->create($contractAddress,true);
+                $contractEntity->setAbi($saveAbi);
+
+            }
+
+            if ($abi){
+
+                $contractEntity->setAbi(json_encode($saveAbi));
+            }
 
 
-       }
+
+
+        }
 
 
 
@@ -335,6 +337,8 @@ class BlockProcessor
 
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
         $contractFactory->populateLocal();
+        /**@var BlockchainContractFactory $contractFactory */
+        $contractFactory->populateBrotherEntities(EthereumContractFactory::ABI_VERB);
 
         foreach ($contractFactory->entityArray as $contract ){
 
@@ -368,7 +372,7 @@ class BlockProcessor
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            new ContractEventProcessor($web3, $smartContracts,9478756);
+            new ContractEventProcessor($web3, $smartContracts,$this->fromBlockNumber);
         }
         catch (\Exception $exception) {
 
@@ -382,7 +386,7 @@ class BlockProcessor
 
 
 
-        }
+    }
 
     public function getEvents(){
 

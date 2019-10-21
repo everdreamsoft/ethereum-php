@@ -17,11 +17,13 @@ use Ethereum\DataType\EthQ;
 use Ethereum\DataType\Transaction;
 use Ethereum\Ethereum;
 use Ethereum\Sandra\EthereumContractFactory;
+use SandraCore\System;
 
 class ContractEventProcessor extends BlockProcessor {
 
     /* @var \Ethereum\SmartContract[] $contracts */
     private $contracts;
+    private $processor ;
 
     /**
      * BlockProcessor constructor.
@@ -32,6 +34,8 @@ class ContractEventProcessor extends BlockProcessor {
      *   This function will be called at each block.
      *
      * @param int $fromBlockNumber
+     *
+     * @param \Ethereum\BlockProcessor $processor
      *
      * @param int|null $toBlockNumber
      *   Will default to latest at script start time or Block or 0.
@@ -49,6 +53,7 @@ class ContractEventProcessor extends BlockProcessor {
     public function __construct(
       Ethereum $web3,
       array $contracts,
+      \Ethereum\BlockProcessor $processor,
       $fromBlockNumber = null,
       $toBlockNumber = null,
       ?bool $persistent = false,
@@ -59,6 +64,7 @@ class ContractEventProcessor extends BlockProcessor {
         $this->contracts = self::addressifyKeys($contracts);
         $args = func_get_args();
         $args[1] = array($this, 'processBlock');
+        $this->processor = $processor ;
         parent::__construct(...$args);
     }
 
@@ -70,7 +76,7 @@ class ContractEventProcessor extends BlockProcessor {
     protected function processBlock(?Block $block) {
 
         echo '### Block number ' . $block->number->val() . PHP_EOL;
-        $ethereumAddressFactory = new EthereumAddressFactory();
+
         //print_r($this->contracts);
 
         if (count($block->transactions)) {
@@ -96,7 +102,8 @@ class ContractEventProcessor extends BlockProcessor {
                                 //$me->create(EthereumBlockchain::class,)
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
-                                $ethereumAddressFactory = new EthereumAddressFactory();
+                                $ethereumAddressFactory = $this->processor->rpcProvider->getBlockchain()->getAddressFactory();
+                                $blockchain =  $this->processor->rpcProvider->getBlockchain();
 
                                 if (isset ( $eventData['_from'])){
                                     $from = $eventData['_from']->hexval();
@@ -123,16 +130,16 @@ class ContractEventProcessor extends BlockProcessor {
 
 
                                 $blockId = $block->number->val();
-                                $blockFactory = new BlockchainBlockFactory(new EthereumBlockchain());
+                                $blockFactory = new BlockchainBlockFactory($blockchain);
                                 $sandraBlock = $blockFactory->getOrCreateFromRef(BlockchainBlockFactory::INDEX_SHORTNAME,$blockId);
 
 
 
 
-                                $ethereumEventFactory = new EthereumEventFactory();
-                                $ethereumContractFactory = new EthereumContractFactory(SandraManager::getSandra());
+                                $ethereumEventFactory =  $this->processor->rpcProvider->getBlockchain()->getEventFactory();
+                                $ethereumContractFactory = $this->processor->rpcProvider->getBlockchain()->getContractFactory();
                                 $sandraContract = $ethereumContractFactory->get($contract->getAddress());
-                                $ethereumEventFactory->create(new EthereumBlockchain(),$fromEntity,$toEntity,$sandraContract,$tx->hash->val(),
+                                $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraContract,$tx->hash->val(),
                                  $block->timestamp->val(),$sandraBlock,null,$quantity );
 
 
