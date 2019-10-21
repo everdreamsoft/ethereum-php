@@ -16,11 +16,12 @@ use App\Blockchains\Bitcoin\BitcoinAddress;
 use App\Blockchains\BlockchainAddress;
 use App\Blockchains\BlockchainAddressFactory;
 use App\Blockchains\BlockchainContract;
+use CsCannon\Blockchains\Blockchain;
 use SandraCore\Entity;
 use SandraCore\ForeignEntityAdapter;
 use SandraCore\System;
 
-class EthereumContract extends Entity
+class EthereumContract extends \CsCannon\Blockchains\Ethereum\EthereumContract
 {
 
     protected static $isa = 'ethContract';
@@ -62,6 +63,8 @@ class EthereumContract extends Entity
     }
 
 
-
-
+    public function getBlockchain(): Blockchain
+    {
+        parent::getBlockchain();
+    }
 }

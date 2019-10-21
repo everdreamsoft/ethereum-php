@@ -9,6 +9,8 @@
 namespace Ethereum;
 
 
+use CsCannon\Blockchains\BlockchainContractFactory;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
 use CsCannon\SandraManager;
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthBlockParam;
@@ -51,13 +53,13 @@ class BlockProcessor
             $contractArray = $contract ;
         }
 
-        $contractFactory = new EthereumContractFactory($sandra);
+        $contractFactory = new EthereumContractFactory();
 
         print_r($contractArray);
 
 
       //we search matching addressses
-        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get($contractFactory::IDENTIFIER),$sandra,'',$sandra->systemConcept->get(EthereumContractFactory::$file));
+        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(BlockchainContractFactory::$file));
         $contractFactory->conceptArray = $conceptsArray ;//we preload the factory with found concepts
 
         $contractFactory->populateLocal();
@@ -98,12 +100,13 @@ class BlockProcessor
            }
 
 
-          $contractEntity = $contractFactory->get($contractAddress);
+          $contractEntity = $contractFactory->get($contractAddress,true,ERC20::init());
 
           if (!$contractEntity){
 
 
-              $contractEntity = $contractFactory->create($contractAddress,$abi,true);
+              $contractEntity = $contractFactory->create($contractAddress,true);
+              $contractEntity->setAbi($saveAbi);
 
           }
 
@@ -149,7 +152,7 @@ class BlockProcessor
             /** @var EthereumContract $contract */
 
             $abi = json_decode($contract->getAbi());
-            $contractAddress = $contract->get(EthereumContractFactory::IDENTIFIER);
+            $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
             echo "address is $contractAddress";
 
             try {
