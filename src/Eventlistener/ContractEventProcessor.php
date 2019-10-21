@@ -104,13 +104,15 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 //is the tx already in DB ?
 
+                                $txHashUnid = $this->processor->sandra->systemConcept->get(Blockchain::$txidConceptName);
+
 
                                 //$me->create(EthereumBlockchain::class,)
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
                                 $ethereumAddressFactory = $this->processor->rpcProvider->getBlockchain()->getAddressFactory();
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
-                                if(DatabaseAdapter::searchConcept($tx->hash->val(),Blockchain::$txidConceptName,$ethereumAddressFactory->system)){
+                                if(DatabaseAdapter::searchConcept($tx->hash->val(),$txHashUnid,$ethereumAddressFactory->system)){
                                     echo"tx alrady in DB bypass ".$tx->hash->val();
                                     continue ;
 
