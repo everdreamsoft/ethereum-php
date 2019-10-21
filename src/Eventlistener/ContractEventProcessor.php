@@ -3,6 +3,7 @@
 namespace Ethereum\Eventlistener;
 
 use CsCannon\AssetCollectionFactory;
+use CsCannon\Blockchains\Blockchain;
 use CsCannon\Blockchains\BlockchainBlock;
 use CsCannon\Blockchains\BlockchainBlockFactory;
 use CsCannon\Blockchains\BlockchainEventFactory;
@@ -17,6 +18,7 @@ use Ethereum\DataType\EthQ;
 use Ethereum\DataType\Transaction;
 use Ethereum\Ethereum;
 use Ethereum\Sandra\EthereumContractFactory;
+use SandraCore\DatabaseAdapter;
 use SandraCore\System;
 
 class ContractEventProcessor extends BlockProcessor {
@@ -99,11 +101,21 @@ class ContractEventProcessor extends BlockProcessor {
 
                             if ($event->hasData() && $event->getName() == 'Transfer') {
                                 echo"Transfer found".$event->getName(), "\n";
+
+                                //is the tx already in DB ?
+
+
                                 //$me->create(EthereumBlockchain::class,)
                                 $eventData = $event->getData();
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
                                 $ethereumAddressFactory = $this->processor->rpcProvider->getBlockchain()->getAddressFactory();
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
+                                if(DatabaseAdapter::searchConcept($tx->hash->val(),Blockchain::$txidConceptName,$ethereumAddressFactory->system)){
+                                    echo"tx alrady in DB bypass ".$tx->hash->val();
+                                    continue ;
+
+                                }
+
 
                                 if (isset ( $eventData['_from'])){
                                     $from = $eventData['_from']->hexval();
@@ -132,6 +144,8 @@ class ContractEventProcessor extends BlockProcessor {
                                 $blockId = $block->number->val();
                                 $blockFactory = new BlockchainBlockFactory($blockchain);
                                 $sandraBlock = $blockFactory->getOrCreateFromRef(BlockchainBlockFactory::INDEX_SHORTNAME,$blockId);
+
+
 
 
 
