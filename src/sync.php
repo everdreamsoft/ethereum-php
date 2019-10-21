@@ -8,15 +8,18 @@
 
 namespace Ethereum;
 
+use CsCannon\Blockchains\Ethereum\DataSource\InfuraProvider;
+use CsCannon\Blockchains\Klaytn\OfficialProvider;
 use CsCannon\SandraManager;
 use SandraCore\Setup;
 
 require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Composer autoload
 
 
-$myProcessor = new BlockProcessor();
-
 $sandra = SandraManager::getSandra();
+$myProcessor = new BlockProcessor(new OfficialProvider(),$sandra,10000);
+
+
 
 //Setup::flushDatagraph($sandra);
 

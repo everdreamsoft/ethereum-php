@@ -372,7 +372,7 @@ class BlockProcessor
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            new ContractEventProcessor($web3, $smartContracts,$this->fromBlockNumber);
+            new ContractEventProcessor($web3, $smartContracts,$this,$this->fromBlockNumber);
         }
         catch (\Exception $exception) {
 

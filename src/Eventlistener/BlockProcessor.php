@@ -48,6 +48,7 @@ class BlockProcessor {
     public function __construct(
       Ethereum $web3,
       callable $callback,
+      \Ethereum\BlockProcessor $processor,
       $fromBlockNumber = null,
       $toBlockNumber = null,
       ?bool $persistent = false,
