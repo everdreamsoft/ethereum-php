@@ -114,7 +114,7 @@ class ContractEventProcessor extends BlockProcessor {
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
                                 if(DatabaseAdapter::searchConcept($tx->hash->val(),$txHashUnid,$ethereumAddressFactory->system)){
                                     echo"tx alrady in DB bypass ".$tx->hash->val();
-                                    continue ;
+                                    //continue ;
 
                                 }
 
@@ -149,13 +149,26 @@ class ContractEventProcessor extends BlockProcessor {
 
 
 
+                                try{
+                                    $balance = $contract->getBalance($toEntity);
+                                    echo print_r($balance);
+                                }
+                                catch (\Exception $e){
 
+                                    echo"Exception ".$e->getMessage();
+                                   //echo $this->web3->debugHtml;
+                                   die();
+
+                                }
 
 
                                 $ethereumEventFactory =  $this->processor->rpcProvider->getBlockchain()->getEventFactory();
                                 $ethereumContractFactory = $this->processor->rpcProvider->getBlockchain()->getContractFactory();
                                 $sandraContract = $ethereumContractFactory->get($contract->getAddress());
                                 $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraContract,$tx->hash->val(),
+
+
+
                                  $block->timestamp->val(),$sandraBlock,null,$quantity );
 
 
@@ -185,12 +198,12 @@ class ContractEventProcessor extends BlockProcessor {
 
     /**
      * @param $contracts
-     * @return \Ethereum\SmartContract[]
+     * @return \Ethereum\CrystalSpark\CsSmartContract[]
      */
     private static function addressifyKeys($contracts){
 
         foreach ($contracts as $i => $c) {
-            /* @var \Ethereum\SmartContract $c */
+            /* @var \Ethereum\CrystalSpark\CsSmartContract $c */
             $contracts[strtolower($c->getAddress())] = $c;
             unset($contracts[$i]);
         }

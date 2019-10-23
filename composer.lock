@@ -96,12 +96,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/CrystalSpark-Cannon.git",
-                "reference": "f5af4f85d2783bd6e068a53e8f71c047e466da85"
+                "reference": "31e813290550915d30db818b33ffcc0a1c068def"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/f5af4f85d2783bd6e068a53e8f71c047e466da85",
-                "reference": "f5af4f85d2783bd6e068a53e8f71c047e466da85",
+                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/31e813290550915d30db818b33ffcc0a1c068def",
+                "reference": "31e813290550915d30db818b33ffcc0a1c068def",
                 "shasum": ""
             },
             "require": {
@@ -127,7 +127,7 @@
                 }
             ],
             "description": "Syndicated interface for multiple blockchains",
-            "time": "2019-10-21T12:46:41+00:00"
+            "time": "2019-10-23T07:00:50+00:00"
         },
         {
             "name": "everdreamsoft/sandra",

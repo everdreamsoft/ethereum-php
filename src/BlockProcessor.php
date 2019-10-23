@@ -14,6 +14,7 @@ use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
 use CsCannon\Blockchains\RpcProvider;
 use CsCannon\SandraManager;
 
+use Ethereum\CrystalSpark\CsSmartContract;
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\FilterChange;
@@ -52,6 +53,7 @@ class BlockProcessor
         $this->rpcProvider = $provider ;
         $this->fromBlockNumber = $fromBlockNumber ;
         SandraManager::setSandra($sandra);
+        $this->sandra = $sandra ;
 
 
     }
@@ -330,10 +332,7 @@ class BlockProcessor
 
         //Then we process blocks from the lowest block of those contracts
 
-        $hosts = [
-            // Start testrpc, geth or parity locally.
-            'https://testnet2.matic.network'
-        ];
+
 
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
         $contractFactory->populateLocal();
@@ -347,11 +346,12 @@ class BlockProcessor
             $abi = json_decode($contract->getAbi());
             $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
             echo "address is $contractAddress";
+            if (!is_array($abi)) continue ;
 
             try {
 
                 $web3 = new Ethereum($this->rpcProvider->getHostUrl());
-                $smartContract = new SmartContract($abi, $contractAddress, $web3);
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3);
 
                 $smartContracts[] = $smartContract;
             }

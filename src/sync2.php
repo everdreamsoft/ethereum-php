@@ -11,23 +11,21 @@ namespace Ethereum;
 use CsCannon\Blockchains\Ethereum\DataSource\InfuraProvider;
 use CsCannon\Blockchains\Klaytn\OfficialProvider;
 use CsCannon\SandraManager;
-use Ethereum\CrystalSpark\CsSmartContract;
 use SandraCore\Setup;
 
 require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Composer autoload
 
 
+$offset = 0 ;
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
+
 $sandra = SandraManager::getSandra();
-$provider = new InfuraProvider('a6e34ed067c74f25ba705456d73a471e');
-$myProcessor = new BlockProcessor(,$sandra,10000);
-
-$web3 = new Ethereum($provider->getHostUrl());
-$smartContract = new CsSmartContract($abi, $contractAddress, $web3);
-
-
-
-
-
+$myProcessor = new BlockProcessor(new OfficialProvider(),$sandra,9478756);
 
 //Setup::flushDatagraph($sandra);
 
@@ -65,8 +63,6 @@ echo"tracked :";
 print_r($trackedContractArray);
 
 echo "processing";
-
-
 
 
 
