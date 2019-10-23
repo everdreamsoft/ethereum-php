@@ -25,7 +25,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$sandra = new System('infura',true);
+$sandra = new System('klaytn',true,'127.0.0.1','sandra','root','');
 $sandra = SandraManager::setSandra($sandra);
 $provider = new OfficialProvider('a6e34ed067c74f25ba705456d73a471e');
 $myProcessor = new BlockProcessor($provider,$sandra,
@@ -214,9 +214,9 @@ $strJsonFileContents = "[
 $result = json_decode($strJsonFileContents);
 
 
-$myDaiContractAddress = '0xB2c48D6384feA29283b51622f179dC51ffB178E0';
+$myContract = '0xB2c48D6384feA29283b51622f179dC51ffB178E0';
 
-$smartContract = new CsSmartContract($result, $myDaiContractAddress, $web3);
+$smartContract = new CsSmartContract($result, $myContract, $web3);
 $ethereumAF = new EthereumAddressFactory();
 $ethereumAddress = $ethereumAF->get('0xb9676bf359c10e7d4850e357cfcf49d0ad29c2e1');
 
@@ -225,8 +225,7 @@ try {
     $networkId = '5777';
 
     $balance = $smartContract->getBalance($ethereumAddress);
-    // By default ContractEventProcessor
-    // process any Transaction from Block-0 to latest Block (at script run time).
+
 
 }
 catch (\Exception $exception) {
