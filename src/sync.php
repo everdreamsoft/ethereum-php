@@ -19,7 +19,7 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Autoload files using Compos
 
 $sandra = SandraManager::getSandra();
 $provider = new InfuraProvider('a6e34ed067c74f25ba705456d73a471e');
-$myProcessor = new BlockProcessor(,$sandra,10000);
+$myProcessor = new BlockProcessor(,$sandra,8159452);
 
 $web3 = new Ethereum($provider->getHostUrl());
 $smartContract = new CsSmartContract($abi, $contractAddress, $web3);
