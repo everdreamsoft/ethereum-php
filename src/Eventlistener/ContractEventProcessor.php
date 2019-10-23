@@ -150,13 +150,13 @@ class ContractEventProcessor extends BlockProcessor {
 
 
                                 try{
-                                    $balance = $contract->getBalance($toEntity);
+                                    $balance = $contract->getBalance($fromEntity);
                                     echo print_r($balance);
                                 }
                                 catch (\Exception $e){
 
                                     echo"Exception ".$e->getMessage();
-                                   //echo $this->web3->debugHtml;
+                                   echo $this->web3->debugHtml;
                                    die();
 
                                 }
