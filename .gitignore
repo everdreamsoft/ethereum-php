@@ -6,6 +6,7 @@ docs
 doc
 *generatedTest.php
 public
+src/test
 
 !docs/.gitkeep
 
