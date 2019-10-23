@@ -27,7 +27,7 @@ error_reporting(E_ALL);
 
 $sandra = new System('klaytn',true,'127.0.0.1','sandra','root','');
 $sandra = SandraManager::setSandra($sandra);
-$provider = new OfficialProvider('a6e34ed067c74f25ba705456d73a471e');
+$provider = new OfficialProvider('');
 $myProcessor = new BlockProcessor($provider,$sandra,
     10289907);
 
