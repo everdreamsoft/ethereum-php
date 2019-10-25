@@ -25,7 +25,7 @@ use Ethereum\SmartContract;
 class CsSmartContract extends SmartContract
 {
     public $rpcProvider ;
-    public $CsEntity ;
+    public $csEntity ;
 
 
     public function __construct(array $abi, string $contractAddress, Ethereum $eth, RpcProvider $provider, BlockchainContract $contract)
@@ -41,27 +41,27 @@ class CsSmartContract extends SmartContract
 
         $balance = null ;
 
-       if (method_exists($this->rpcProvider,'getBalance')){
+        if (method_exists($this->rpcProvider,'getBalance')){
 
-           $quantity = $this->rpcProvider->getBalance($this->csEntity,$address,ERC20::init());
+            $quantity = $this->rpcProvider->getBalance($this->csEntity,$address,ERC20::init());
 
-           if( !is_int($quantity)){
-               return null ;
+            if( !is_numeric($quantity)){
+                return null ;
 
-           }
+            }
 
-           $balance = new Balance($address);
-           $balance->addContractToken($this->csEntity,ERC20::init(),$quantity);
-           $balance->saveToDatagraph($atBlock);
+            $balance = new Balance($address);
+            $balance->addContractToken($this->csEntity,ERC20::init(),$quantity);
+            $balance->saveToDatagraph($atBlock);
 
-       }
-
-
-
-       return $balance ;
+        }
 
 
-       // return $this->balanceOf($addressEth)->val();
+
+        return $balance ;
+
+
+        // return $this->balanceOf($addressEth)->val();
 
 
     }

@@ -151,6 +151,7 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 try{
                                     $balance = $contract->getBalance($fromEntity,$sandraBlock);
+                                    $balance = $contract->getBalance($toEntity,$sandraBlock);
                                     echo print_r($balance);
                                 }
                                 catch (\Exception $e){
