@@ -337,21 +337,21 @@ class BlockProcessor
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
         $contractFactory->populateLocal();
         /**@var BlockchainContractFactory $contractFactory */
-        $contractFactory->populateBrotherEntities(EthereumContractFactory::ABI_VERB);
+        $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
 
         foreach ($contractFactory->entityArray as $contract ){
 
             /** @var EthereumContract $contract */
 
             $abi = json_decode($contract->getAbi());
-            $contractAddress = $contract->get(EthereumContractFactory::MAIN_IDENTIFIER);
+            $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
             echo "address is $contractAddress";
             if (!is_array($abi)) continue ;
 
             try {
 
                 $web3 = new Ethereum($this->rpcProvider->getHostUrl());
-                $smartContract = new CsSmartContract($abi, $contractAddress, $web3);
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3,$this->rpcProvider,$contract);
 
                 $smartContracts[] = $smartContract;
             }
