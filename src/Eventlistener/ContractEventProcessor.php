@@ -59,7 +59,7 @@ class ContractEventProcessor extends BlockProcessor {
       $fromBlockNumber = null,
       $toBlockNumber = null,
       ?bool $persistent = false,
-      ?float $timePerLoop = 0.1
+      ?float $timePerLoop = 0.01
     )
     {
         // Add contracts.

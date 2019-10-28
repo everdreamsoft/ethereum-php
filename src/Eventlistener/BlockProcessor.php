@@ -11,8 +11,8 @@ class BlockProcessor {
 
     /* @var \Ethereum\Ethereum $web3 */
     protected $web3;
-    protected $fromBlockNumber;
-    protected $toBlockNumber;
+    public $fromBlockNumber;
+    public $toBlockNumber;
     protected $increment;
 
     protected $isInfinite;
@@ -52,7 +52,7 @@ class BlockProcessor {
       $fromBlockNumber = null,
       $toBlockNumber = null,
       ?bool $persistent = false,
-      ?float $timePerLoop = 0.3
+      ?float $timePerLoop = 0.01
     )
     {
         $this->web3 = $web3;
