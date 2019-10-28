@@ -59,7 +59,7 @@ class ContractEventProcessor extends BlockProcessor {
       $fromBlockNumber = null,
       $toBlockNumber = null,
       ?bool $persistent = false,
-      ?float $timePerLoop = 0.3
+      ?float $timePerLoop = 0.1
     )
     {
         // Add contracts.
@@ -114,7 +114,7 @@ class ContractEventProcessor extends BlockProcessor {
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
                                 if(DatabaseAdapter::searchConcept($tx->hash->val(),$txHashUnid,$ethereumAddressFactory->system)){
                                     echo"tx alrady in DB bypass ".$tx->hash->val();
-                                    //continue ;
+                                    continue ;
 
                                 }
 
