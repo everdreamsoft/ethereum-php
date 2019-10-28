@@ -332,8 +332,6 @@ class BlockProcessor
 
         //Then we process blocks from the lowest block of those contracts
 
-
-
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
         $contractFactory->populateLocal();
         /**@var BlockchainContractFactory $contractFactory */
