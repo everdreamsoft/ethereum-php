@@ -325,6 +325,24 @@ class BlockProcessor
 
         // First we get tracked contracts
 
+
+
+        $this->startLoop();
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    public function startLoop($isInfinite = true){
+
         $sandra = SandraManager::getSandra();
 
         //
@@ -363,24 +381,10 @@ class BlockProcessor
 
         }
 
-        $this->startLoop($web3, $smartContracts);
-
-
-
-
-
-
-
-
-
-
-
-    }
-
-    public function startLoop($web3, $smartContracts, $isInfinite = true){
 
         try {
 
+            $web3 = new Ethereum($this->rpcProvider->getHostUrl());
             $networkId = '5777';
 
             $persistant = false ;
@@ -398,12 +402,13 @@ class BlockProcessor
         }
 
 
+
         echo "\n restarting lookp";
         sleep(15);
         $this->fromBlockNumber = $contractProcessor->toBlockNumber ;
 
 
-        $this->startLoop($web3, $smartContracts, $isInfinite);
+        $this->startLoop($smartContracts, $isInfinite);
 
 
 
