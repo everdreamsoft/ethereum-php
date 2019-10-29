@@ -345,6 +345,8 @@ class BlockProcessor
 
         $sandra = SandraManager::getSandra();
 
+        $restartAfterBlocks = 1000 ;
+
         //
 
 
@@ -393,7 +395,7 @@ class BlockProcessor
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            $contractProcessor =  new ContractEventProcessor($web3, $smartContracts,$this,$this->fromBlockNumber,null,$persistant);
+            $contractProcessor =  new ContractEventProcessor($web3, $smartContracts,$this,$this->fromBlockNumber,$this->fromBlockNumber+$restartAfterBlocks,$persistant);
         }
         catch (\Exception $exception) {
 
