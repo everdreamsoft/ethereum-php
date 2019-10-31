@@ -54,7 +54,7 @@ $trackedContractArray[] = '0x53Dd98cA4B63178841155fCd80d4C4Ca7D5Ba331'; // Settl
 $trackedContractArray[] = '0x7cDB98E90441DC2040B7a1627a1335D99B4C3859'; // Settler Horse
 
 
-$myProcessor->trackContract($trackedContractArray);
+//$myProcessor->trackContract($trackedContractArray);
 
 echo"tracked :";
 print_r($trackedContractArray);

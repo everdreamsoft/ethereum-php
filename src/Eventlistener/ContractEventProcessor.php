@@ -77,7 +77,8 @@ class ContractEventProcessor extends BlockProcessor {
      */
     protected function processBlock(?Block $block) {
 
-        echo '### Block number ' . $block->number->val() . PHP_EOL;
+        echo '### Block number ' . $block->number->val() ;
+        echo " memory ".memory_get_usage() . PHP_EOL;
 
         //print_r($this->contracts);
 

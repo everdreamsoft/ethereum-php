@@ -11,6 +11,7 @@ namespace Ethereum;
 
 use CsCannon\Blockchains\BlockchainContractFactory;
 use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
+use CsCannon\Blockchains\Klaytn\KlaytnContractFactory;
 use CsCannon\Blockchains\RpcProvider;
 use CsCannon\SandraManager;
 
@@ -43,31 +44,31 @@ class CallableEvents extends SmartContract {
 class BlockProcessor
 {
 
-    public $rpcProvider = null ;
-    public $fromBlockNumber = null ;
-    public $sandra = null ;
+    public $rpcProvider = null;
+    public $fromBlockNumber = null;
+    public $sandra = null;
 
     public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
 
-        $this->rpcProvider = $provider ;
-        $this->fromBlockNumber = $fromBlockNumber ;
+        $this->rpcProvider = $provider;
+        $this->fromBlockNumber = $fromBlockNumber;
         SandraManager::setSandra($sandra);
-        $this->sandra = $sandra ;
+        $this->sandra = $sandra;
 
 
     }
 
 
-    public function trackContract($contract,$abiArray=null){
+    public function trackContract($contract, $abiArray = null)
+    {
 
         $sandra = SandraManager::getSandra();
 
-        if (!is_array($contract)){
-            $contractArray[] = $contract ;
-        }
-        else{
-            $contractArray = $contract ;
+        if (!is_array($contract)) {
+            $contractArray[] = $contract;
+        } else {
+            $contractArray = $contract;
         }
 
         $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
@@ -78,21 +79,20 @@ class BlockProcessor
 
 
         //we search matching addressses
-        $conceptsArray = DatabaseAdapter::searchConcept($contractArray,$sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER),$sandra,'',$sandra->systemConcept->get(BlockchainContractFactory::$file));
-        $contractFactory->conceptArray = $conceptsArray ;//we preload the factory with found concepts
+        $conceptsArray = DatabaseAdapter::searchConcept($contractArray, $sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER), $sandra, '', $sandra->systemConcept->get(BlockchainContractFactory::$file));
+        $contractFactory->conceptArray = $conceptsArray;//we preload the factory with found concepts
 
         $contractFactory->populateLocal();
 
 
+        foreach ($contractArray as $index => $contractAddress) {
 
-        foreach ($contractArray as $index => $contractAddress){
-
-            $abi = null ;
+            $abi = null;
             //do we have a related abi
-            if(is_array($abiArray)){
-                if (isset ($abiArray[$index])){
+            if (is_array($abiArray)) {
+                if (isset ($abiArray[$index])) {
 
-                    $abi = $abiArray[$index] ;
+                    $abi = $abiArray[$index];
                 }
 
             }
@@ -278,9 +278,8 @@ class BlockProcessor
 ]";
 
 
-
                     $result = json_decode($strJsonFileContents);
-                    $abiRaw = $result ;
+                    $abiRaw = $result;
                     $abiRefined = $abiRaw;
                     $abi = $abiRefined;
                     $saveAbi = $abiRefined;
@@ -293,59 +292,44 @@ class BlockProcessor
             }
 
 
-            $contractEntity = $contractFactory->get($contractAddress,true,ERC20::init());
+            $contractEntity = $contractFactory->get($contractAddress, true, ERC20::init());
 
-            if (!$contractEntity){
+            if (!$contractEntity) {
 
 
-                $contractEntity = $contractFactory->create($contractAddress,true);
+                $contractEntity = $contractFactory->create($contractAddress, true);
                 $contractEntity->setAbi($saveAbi);
 
             }
 
-            if ($abi){
+            if ($abi) {
 
                 $contractEntity->setAbi(json_encode($saveAbi));
             }
 
 
-
-
         }
-
-
-
-
-
 
 
     }
 
-    public function process(){
+    public function process()
+    {
 
         // First we get tracked contracts
-
 
 
         $this->startLoop();
 
 
-
-
-
-
-
-
-
-
-
     }
 
-    public function startLoop($isInfinite = true){
+    public function startLoop($isInfinite = true)
+    {
 
         $sandra = SandraManager::getSandra();
 
-        $restartAfterBlocks = 1000 ;
+        $restartAfterBlocks = 100;
 
         //
 
@@ -357,28 +341,27 @@ class BlockProcessor
         /**@var BlockchainContractFactory $contractFactory */
         $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
 
-        foreach ($contractFactory->entityArray as $contract ){
+        foreach ($contractFactory->entityArray as $contract) {
 
             /** @var EthereumContract $contract */
 
             $abi = json_decode($contract->getAbi());
             $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
             echo "address is $contractAddress";
-            if (!is_array($abi)) continue ;
+            if (!is_array($abi)) continue;
 
             try {
 
                 $web3 = new Ethereum($this->rpcProvider->getHostUrl());
-                $smartContract = new CsSmartContract($abi, $contractAddress, $web3,$this->rpcProvider,$contract);
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3, $this->rpcProvider, $contract);
 
                 $smartContracts[] = $smartContract;
-            }
-            catch (\Exception $exception) {
+            } catch (\Exception $exception) {
 
                 throw new $exception;
             }
 
-            $abi = null ;
+            $abi = null;
 
 
         }
@@ -389,48 +372,39 @@ class BlockProcessor
             $web3 = new Ethereum($this->rpcProvider->getHostUrl());
             $networkId = '5777';
 
-            $persistant = false ;
-            if ($this->fromBlockNumber == 'latest') $persistant = true ;
+            $persistant = false;
+            if ($this->fromBlockNumber == 'latest') $persistant = true;
 
 
             // By default ContractEventProcessor
             // process any Transaction from Block-0 to latest Block (at script run time).
-            $contractProcessor =  new ContractEventProcessor($web3, $smartContracts,$this,$this->fromBlockNumber,$this->fromBlockNumber+$restartAfterBlocks,$persistant);
-        }
-        catch (\Exception $exception) {
+            $from = $this->fromBlockNumber;
+            $to = $this->fromBlockNumber + $restartAfterBlocks;
+            $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
+            echo "finished syncing {$restartAfterBlocks} blocks ({from} to {to})\n";
+
+            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+            $liveFactory->populateLocal();
+            $liveData = $liveFactory->last("sync", 'live2');
+
+            $liveData->createOrUpdateRef('lastBlock', $to);
+
+
+        } catch (\Exception $exception) {
 
             echo $exception->getMessage();
             throw new $exception;
         }
 
 
-
-        echo "\n restarting lookp";
-        sleep(15);
-        $this->fromBlockNumber = $contractProcessor->toBlockNumber ;
-
-
-        $this->startLoop($smartContracts, $isInfinite);
+        //echo "\n restarting lookp";
+        //sleep(2);
+        //$this->fromBlockNumber = $contractProcessor->toBlockNumber ;
 
 
-
-
+        // $this->startLoop($smartContracts, $isInfinite);
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
