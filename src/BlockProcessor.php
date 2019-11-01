@@ -69,6 +69,7 @@ class BlockProcessor
 
 
 
+//ins't it already populated ?
         $contractList = $contractFactory->populateLocal();
 
 

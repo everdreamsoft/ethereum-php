@@ -96,17 +96,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/CrystalSpark-Cannon.git",
-                "reference": "e54fa475a32e0d1e0c916530274a68bad8b05937"
+                "reference": "7358ba7360e75c1e212f2e822fc2a3e9ed016b4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/e54fa475a32e0d1e0c916530274a68bad8b05937",
-                "reference": "e54fa475a32e0d1e0c916530274a68bad8b05937",
+                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/7358ba7360e75c1e212f2e822fc2a3e9ed016b4a",
+                "reference": "7358ba7360e75c1e212f2e822fc2a3e9ed016b4a",
                 "shasum": ""
             },
             "require": {
-                "everdreamsoft/sandra": "dev-master",
-                "symfony/process": "^5.0@dev"
+                "everdreamsoft/sandra": "dev-master"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8"
@@ -128,7 +127,7 @@
                 }
             ],
             "description": "Syndicated interface for multiple blockchains",
-            "time": "2019-10-25T12:47:48+00:00"
+            "time": "2019-11-01T18:27:51+00:00"
         },
         {
             "name": "everdreamsoft/sandra",
@@ -136,12 +135,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/sandra.git",
-                "reference": "4ffef78654b64d9649713457e4c2a09a6277d7fa"
+                "reference": "380c60b8caa4bc0db2b9ca5fa07304f124449b44"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/4ffef78654b64d9649713457e4c2a09a6277d7fa",
-                "reference": "4ffef78654b64d9649713457e4c2a09a6277d7fa",
+                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/380c60b8caa4bc0db2b9ca5fa07304f124449b44",
+                "reference": "380c60b8caa4bc0db2b9ca5fa07304f124449b44",
                 "shasum": ""
             },
             "require-dev": {
@@ -162,7 +161,7 @@
                 "MIT"
             ],
             "description": "Sandra Ontologic Datagraph",
-            "time": "2019-10-19T09:38:16+00:00"
+            "time": "2019-10-30T13:43:37+00:00"
         },
         {
             "name": "graze/guzzle-jsonrpc",
@@ -876,55 +875,6 @@
                 "shim"
             ],
             "time": "2019-08-06T08:03:45+00:00"
-        },
-        {
-            "name": "symfony/process",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "c05c78d8ce47441af707e56171ad965fd1f42b02"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/c05c78d8ce47441af707e56171ad965fd1f42b02",
-                "reference": "c05c78d8ce47441af707e56171ad965fd1f42b02",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.2.9"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "5.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Process Component",
-            "homepage": "https://symfony.com",
-            "time": "2019-10-22T17:21:12+00:00"
         }
     ],
     "packages-dev": [
@@ -2486,16 +2436,16 @@
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v3.4.32",
+            "version": "v3.4.33",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
-                "reference": "a7c00586a9ef70acf0f17085e51c399bf9620e03"
+                "reference": "b224d20be60e6f7b55cd66914379a13a0b28651a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/a7c00586a9ef70acf0f17085e51c399bf9620e03",
-                "reference": "a7c00586a9ef70acf0f17085e51c399bf9620e03",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/b224d20be60e6f7b55cd66914379a13a0b28651a",
+                "reference": "b224d20be60e6f7b55cd66914379a13a0b28651a",
                 "shasum": ""
             },
             "require": {
@@ -2536,7 +2486,7 @@
                 "configuration",
                 "options"
             ],
-            "time": "2019-08-03T21:15:25+00:00"
+            "time": "2019-10-26T11:02:01+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2598,16 +2548,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.3.5",
+            "version": "v4.3.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "41e16350a2a1c7383c4735aa2f9fce74cf3d1178"
+                "reference": "324cf4b19c345465fad14f3602050519e09e361d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/41e16350a2a1c7383c4735aa2f9fce74cf3d1178",
-                "reference": "41e16350a2a1c7383c4735aa2f9fce74cf3d1178",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/324cf4b19c345465fad14f3602050519e09e361d",
+                "reference": "324cf4b19c345465fad14f3602050519e09e361d",
                 "shasum": ""
             },
             "require": {
@@ -2653,7 +2603,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2019-09-11T15:41:19+00:00"
+            "time": "2019-10-30T12:58:49+00:00"
         },
         {
             "name": "webmozart/assert",
