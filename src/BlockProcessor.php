@@ -304,7 +304,7 @@ class BlockProcessor
 
         $sandra = SandraManager::getSandra();
 
-        $restartAfterBlocks = 100;
+        $restartAfterBlocks = 1000;
 
         //
 
