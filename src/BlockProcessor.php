@@ -47,6 +47,7 @@ class BlockProcessor
     public $rpcProvider = null;
     public $fromBlockNumber = null;
     public $sandra = null;
+    public $persistStream = null; // the stream is the name of the variable in the database where we persist the last synched block
 
     public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
@@ -60,42 +61,23 @@ class BlockProcessor
     }
 
 
-    public function trackContract($contract, $abiArray = null)
+    public function trackContract(BlockchainContractFactory $contractFactory, $abiArray = null)
     {
 
         $sandra = SandraManager::getSandra();
 
-        if (!is_array($contract)) {
-            $contractArray[] = $contract;
-        } else {
-            $contractArray = $contract;
-        }
-
-        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
-
-        // $contractFactory = new EthereumContractFactory();
-
-        //print_r($contractArray);
 
 
-        //we search matching addressses
-        $conceptsArray = DatabaseAdapter::searchConcept($contractArray, $sandra->systemConcept->get(BlockchainContractFactory::MAIN_IDENTIFIER), $sandra, '', $sandra->systemConcept->get(BlockchainContractFactory::$file));
-        $contractFactory->conceptArray = $conceptsArray;//we preload the factory with found concepts
 
-        $contractFactory->populateLocal();
+        $contractList = $contractFactory->populateLocal();
 
 
-        foreach ($contractArray as $index => $contractAddress) {
+        foreach ($contractList as $contractEntity) {
 
-            $abi = null;
+
+            $abi = $contractEntity->getAbi();
             //do we have a related abi
-            if (is_array($abiArray)) {
-                if (isset ($abiArray[$index])) {
 
-                    $abi = $abiArray[$index];
-                }
-
-            }
             //we will look for the abi in etherscan
             if (!$abi) {
 
@@ -292,15 +274,7 @@ class BlockProcessor
             }
 
 
-            $contractEntity = $contractFactory->get($contractAddress, true, ERC20::init());
 
-            if (!$contractEntity) {
-
-
-                $contractEntity = $contractFactory->create($contractAddress, true);
-                $contractEntity->setAbi($saveAbi);
-
-            }
 
             if ($abi) {
 
@@ -383,11 +357,16 @@ class BlockProcessor
             $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
             echo "finished syncing {$restartAfterBlocks} blocks ({from} to {to})\n";
 
-            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
-            $liveFactory->populateLocal();
-            $liveData = $liveFactory->last("sync", 'live2');
+            if ($this->persistStream) {
 
-            $liveData->createOrUpdateRef('lastBlock', $to);
+                $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+                $liveFactory->populateLocal();
+                $liveData = $liveFactory->last("sync", $this->persistStream);
+
+                if ($liveData) {
+                    $liveData->createOrUpdateRef('lastBlock', $to);
+                }
+            }
 
 
         } catch (\Exception $exception) {
