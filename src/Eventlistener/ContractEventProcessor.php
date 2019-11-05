@@ -163,11 +163,17 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 }
 
+                                $txidConcept = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName) ;
+
+                                //transformations
+                                $correctedTx = $this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
+
+
 
                                 $ethereumEventFactory =  $this->processor->rpcProvider->getBlockchain()->getEventFactory();
                                 $ethereumContractFactory = $this->processor->rpcProvider->getBlockchain()->getContractFactory();
                                 $sandraContract = $ethereumContractFactory->get($contract->getAddress());
-                                $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraContract,$tx->hash->val(),
+                                $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraContract,$correctedTx,
 
 
 

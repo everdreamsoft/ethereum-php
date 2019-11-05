@@ -96,12 +96,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/CrystalSpark-Cannon.git",
-                "reference": "7358ba7360e75c1e212f2e822fc2a3e9ed016b4a"
+                "reference": "2aa52c1a86033ebf4a5a2c7f8d6e9505ed66ff14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/7358ba7360e75c1e212f2e822fc2a3e9ed016b4a",
-                "reference": "7358ba7360e75c1e212f2e822fc2a3e9ed016b4a",
+                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/2aa52c1a86033ebf4a5a2c7f8d6e9505ed66ff14",
+                "reference": "2aa52c1a86033ebf4a5a2c7f8d6e9505ed66ff14",
                 "shasum": ""
             },
             "require": {
@@ -127,7 +127,7 @@
                 }
             ],
             "description": "Syndicated interface for multiple blockchains",
-            "time": "2019-11-01T18:27:51+00:00"
+            "time": "2019-11-05T11:32:09+00:00"
         },
         {
             "name": "everdreamsoft/sandra",
@@ -135,12 +135,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/sandra.git",
-                "reference": "380c60b8caa4bc0db2b9ca5fa07304f124449b44"
+                "reference": "61d3821b185a4cdb7f2b79cb28db5a54f034139f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/380c60b8caa4bc0db2b9ca5fa07304f124449b44",
-                "reference": "380c60b8caa4bc0db2b9ca5fa07304f124449b44",
+                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/61d3821b185a4cdb7f2b79cb28db5a54f034139f",
+                "reference": "61d3821b185a4cdb7f2b79cb28db5a54f034139f",
                 "shasum": ""
             },
             "require-dev": {
@@ -161,7 +161,7 @@
                 "MIT"
             ],
             "description": "Sandra Ontologic Datagraph",
-            "time": "2019-10-30T13:43:37+00:00"
+            "time": "2019-11-05T10:17:23+00:00"
         },
         {
             "name": "graze/guzzle-jsonrpc",
