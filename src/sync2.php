@@ -10,6 +10,7 @@ namespace Ethereum;
 
 use CsCannon\Blockchains\Ethereum\DataSource\InfuraProvider;
 use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
+use CsCannon\Blockchains\Klaytn\KlaytnContractFactory;
 use CsCannon\Blockchains\Klaytn\OfficialProvider;
 use CsCannon\SandraManager;
 use Ethereum\CrystalSpark\CsSmartContract;
@@ -33,6 +34,9 @@ $myProcessor = new BlockProcessor($provider,$sandra,
 
 $web3 = new Ethereum($provider->getHostUrl());
 
+$contractFactory = new KlaytnContractFactory();
+
+
 
 
 
@@ -54,7 +58,7 @@ $trackedContractArray[] = '0x53Dd98cA4B63178841155fCd80d4C4Ca7D5Ba331'; // Settl
 $trackedContractArray[] = '0x7cDB98E90441DC2040B7a1627a1335D99B4C3859'; // Settler Horse
 
 
-//$myProcessor->trackContract($trackedContractArray);
+$myProcessor->trackContract($contractFactory);
 
 echo"tracked :";
 print_r($trackedContractArray);

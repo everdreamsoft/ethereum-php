@@ -11,6 +11,8 @@ use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
 use CsCannon\Blockchains\Ethereum\EthereumBlockchain;
 use CsCannon\Blockchains\Ethereum\EthereumEvent;
 use CsCannon\Blockchains\Ethereum\EthereumEventFactory;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC721;
 use CsCannon\SandraManager;
 use \Ethereum\DataType\Block;
 use Ethereum\DataType\EthD32;
@@ -148,11 +150,33 @@ class ContractEventProcessor extends BlockProcessor {
                                 $blockFactory = new BlockchainBlockFactory($blockchain);
                                 $sandraBlock = $blockFactory->getOrCreateFromRef(BlockchainBlockFactory::INDEX_SHORTNAME,$blockId);
 
+                                //ETHQ
+                                /** @var EthQ $tokenId */
+                                if (isset($eventData['tokenId'])) {
+                                    $tokenId = $eventData['tokenId'] ;
+                                    $tokenIdString = $tokenId->val();
+                                    echo" with token ID = ".$tokenIdString."\n";
+                                }
+
 
 
                                 try{
-                                    $balance = $contract->getBalance($fromEntity,$sandraBlock);
-                                    $balance = $contract->getBalance($toEntity,$sandraBlock);
+
+                                    $standard =$contract->csEntity->getStandard();
+                                   echo PHP_EOL. " we have a standasrd". $standard->getStandardName();
+
+                                   if ($standard instanceof ERC20) {
+
+                                      $contract->getBalance($fromEntity, $sandraBlock);
+                                       $contract->getBalance($toEntity, $sandraBlock);
+                                   }
+
+                                    if ($standard instanceof ERC721) {
+
+                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock);
+                                        $standard->setTokenId($tokenIdString);
+                                        $quantity = 1 ;
+                                    }
 
                                 }
                                 catch (\Exception $e){
@@ -177,20 +201,14 @@ class ContractEventProcessor extends BlockProcessor {
 
 
 
-                                 $block->timestamp->val(),$sandraBlock,null,$quantity );
+                                 $block->timestamp->val(),$sandraBlock,$standard,$quantity );
 
 
 
                                 echo"hello Transfer $from to $to ";
 
 
-                                //ETHQ
-                                /** @var EthQ $tokenId */
-                                if (isset($eventData['_tokenId'])) {
-                                    $tokenId = $eventData['_tokenId'] ;
-                                    $tokenIdString = $tokenId->val();
-                                    echo" with token ID = ".$tokenIdString."\n";
-                                }
+
 
 
 
