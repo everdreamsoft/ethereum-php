@@ -81,6 +81,7 @@ class ContractEventProcessor extends BlockProcessor {
 
         echo '### Block number ' . $block->number->val() ;
         echo " memory ".memory_get_usage() . PHP_EOL;
+        $txidConcept = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName) ;
 
         //print_r($this->contracts);
 
@@ -115,8 +116,8 @@ class ContractEventProcessor extends BlockProcessor {
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
                                 $ethereumAddressFactory = $this->processor->rpcProvider->getBlockchain()->getAddressFactory();
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
-                                if(DatabaseAdapter::searchConcept($tx->hash->val(),$txHashUnid,$ethereumAddressFactory->system)){
-                                    echo"tx alrady in DB bypass ".$tx->hash->val();
+                                if(DatabaseAdapter::searchConcept($this->processor->rpcProvider->transform($txidConcept,$tx->hash->val()),$txHashUnid,$ethereumAddressFactory->system)){
+                                    echo"tx alrady in DB bypass ".$this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
                                     continue ;
 
                                 }
@@ -187,7 +188,7 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 }
 
-                                $txidConcept = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName) ;
+
 
                                 //transformations
                                 $correctedTx = $this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());

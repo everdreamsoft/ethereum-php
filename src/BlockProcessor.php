@@ -196,7 +196,7 @@ class BlockProcessor
 
             if ($this->persistStream) {
 
-                echo PHP_EOL. "entering live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl() ;
+                echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
 
                 $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
                 $liveFactory->populateLocal();
