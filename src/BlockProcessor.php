@@ -178,6 +178,7 @@ class BlockProcessor
 
 
         try {
+            $sandra = SandraManager::getSandra();
 
             $web3 = new Ethereum($this->rpcProvider->getHostUrl());
             $networkId = '5777';
@@ -194,6 +195,8 @@ class BlockProcessor
             echo "finished syncing {$restartAfterBlocks} blocks ({from} to {to})\n";
 
             if ($this->persistStream) {
+
+                echo PHP_EOL. "entering live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl() ;
 
                 $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
                 $liveFactory->populateLocal();
