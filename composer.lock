@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aab90d32188f59d0715fe12d7397969d",
+    "content-hash": "6fa37c285333ead74a63df094a876fe1",
     "packages": [
         {
             "name": "digitaldonkey/ecverify",
@@ -92,16 +92,16 @@
         },
         {
             "name": "everdreamsoft/crystal-spark-cannon",
-            "version": "dev-revampStructure",
+            "version": "dev-rc1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/CrystalSpark-Cannon.git",
-                "reference": "39d85157f5dc2032c4ef832fcb14a1327a9c1e3c"
+                "reference": "6093af4bb2723d4d738dbc509b748e2a8ce8969a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/39d85157f5dc2032c4ef832fcb14a1327a9c1e3c",
-                "reference": "39d85157f5dc2032c4ef832fcb14a1327a9c1e3c",
+                "url": "https://api.github.com/repos/everdreamsoft/CrystalSpark-Cannon/zipball/6093af4bb2723d4d738dbc509b748e2a8ce8969a",
+                "reference": "6093af4bb2723d4d738dbc509b748e2a8ce8969a",
                 "shasum": ""
             },
             "require": {
@@ -127,7 +127,7 @@
                 }
             ],
             "description": "Syndicated interface for multiple blockchains",
-            "time": "2019-11-08T18:54:19+00:00"
+            "time": "2019-11-14T10:23:23+00:00"
         },
         {
             "name": "everdreamsoft/sandra",
@@ -135,12 +135,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/everdreamsoft/sandra.git",
-                "reference": "436309d39efcd4d411ca20ab574c1d02cf25c42c"
+                "reference": "bc1c8be91e50b46adaa441319a7f05c0ce9c98bb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/436309d39efcd4d411ca20ab574c1d02cf25c42c",
-                "reference": "436309d39efcd4d411ca20ab574c1d02cf25c42c",
+                "url": "https://api.github.com/repos/everdreamsoft/sandra/zipball/bc1c8be91e50b46adaa441319a7f05c0ce9c98bb",
+                "reference": "bc1c8be91e50b46adaa441319a7f05c0ce9c98bb",
                 "shasum": ""
             },
             "require-dev": {
@@ -161,7 +161,7 @@
                 "MIT"
             ],
             "description": "Sandra Ontologic Datagraph",
-            "time": "2019-11-08T14:42:43+00:00"
+            "time": "2019-11-14T09:27:23+00:00"
         },
         {
             "name": "graze/guzzle-jsonrpc",
@@ -2436,7 +2436,7 @@
         },
         {
             "name": "symfony/options-resolver",
-            "version": "v3.4.33",
+            "version": "v3.4.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/options-resolver.git",
@@ -2548,7 +2548,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v4.3.6",
+            "version": "v4.3.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",

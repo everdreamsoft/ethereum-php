@@ -88,25 +88,29 @@ class CsSmartContract extends SmartContract
             $balance->addContractToken($this->csEntity,$standard,1);
             $balance->saveToDatagraph($atBlock);
 
-            //For the moment we store all assets locally
-            $assetFactory = new AssetFactory($this->csEntity->system);
-            $asset = $assetFactory->get($this->getAddress().'-'.$tokenId);
-            if (is_null($asset)){
+            //temporary for champ
+            if($this->getAddress() == '0x1f49e1d2a4691e4514ae91bc3040767cf344ad82') {
 
-                //temporary for champ
-                $metaData = [\CsCannon\AssetFactory::IMAGE_URL => 'https://klaytn.champ.blockdevs.asia/token_img/'.$tokenId,
-                    \CsCannon\AssetFactory::METADATA_URL => 'https://klaytn.champ.blockdevs.asia/token/'.$tokenId,
-
-                ];
-
-                $collectionFactory = new AssetCollectionFactory($this->csEntity->system);
-                $collection = $collectionFactory->get('KlaytnChamp');
-
-                $additionNalMeta = $standard->getSpecifierData();
+                //For the moment we store all assets locally
+                $assetFactory = new AssetFactory($this->csEntity->system);
+                $asset = $assetFactory->get($this->getAddress() . '-' . $tokenId);
+                if (is_null($asset)) {
 
 
-                $assetFactory->create($this->getAddress().'-'.$tokenId,$metaData,$collection,array($this->csEntity->subjectConcept->idConcept=>$additionNalMeta));
+                    $metaData = [\CsCannon\AssetFactory::IMAGE_URL => 'https://klaytn.champ.blockdevs.asia/token_img/' . $tokenId,
+                        \CsCannon\AssetFactory::METADATA_URL => 'https://klaytn.champ.blockdevs.asia/token/' . $tokenId,
 
+                    ];
+
+                    $collectionFactory = new AssetCollectionFactory($this->csEntity->system);
+                    $collection = $collectionFactory->get('KlaytnChamp');
+
+                    $additionNalMeta = $standard->getSpecifierData();
+
+
+                    $assetFactory->create($this->getAddress() . '-' . $tokenId, $metaData, $collection, array($this->csEntity->subjectConcept->idConcept => $additionNalMeta));
+
+                }
             }
 
 

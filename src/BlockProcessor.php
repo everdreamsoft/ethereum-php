@@ -48,6 +48,7 @@ class BlockProcessor
     public $fromBlockNumber = null;
     public $sandra = null;
     public $persistStream = null; // the stream is the name of the variable in the database where we persist the last synched block
+    public $bypassKnownTx = true; // the stream is the name of the variable in the database where we persist the last synched block
 
     public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
@@ -123,13 +124,16 @@ class BlockProcessor
 
     }
 
-    public function process()
+    public function process($iterations=1000)
     {
 
         // First we get tracked contracts
 
+        $smartContracts = $this->prepare();
+        $this->start($smartContracts,$iterations);
 
-        $this->startLoop();
+
+       // $this->startLoop();
 
 
     }
@@ -221,6 +225,110 @@ class BlockProcessor
 
 
         // $this->startLoop($smartContracts, $isInfinite);
+
+
+    }
+
+    public function start($smartContracts,$iterations)
+    {
+
+        echo "Starting from block $this->fromBlockNumber  with iteration:$iterations".PHP_EOL;
+
+
+
+        try {
+            $sandra = SandraManager::getSandra();
+
+            $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+            $networkId = '5777';
+
+            $persistant = false;
+            if ($this->fromBlockNumber == 'latest') $persistant = true;
+
+
+            // By default ContractEventProcessor
+            // process any Transaction from Block-0 to latest Block (at script run time).
+            $from = $this->fromBlockNumber;
+            $to = $this->fromBlockNumber + $iterations;
+            echo "To Block $to".PHP_EOL;
+            $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
+            echo "finished syncing {$iterations} blocks ({from} to {to}) to block $persistant\n";
+
+            if ($this->persistStream) {
+
+                echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
+
+                $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+                $liveFactory->populateLocal();
+                $liveData = $liveFactory->last("sync", $this->persistStream);
+
+                if ($liveData) {
+                    $liveData->createOrUpdateRef('lastBlock', $to);
+                }
+            }
+
+
+        } catch (\Exception $exception) {
+
+            echo $exception->getMessage();
+            throw new $exception;
+        }
+
+
+        //echo "\n restarting lookp";
+        //sleep(2);
+        //$this->fromBlockNumber = $contractProcessor->toBlockNumber ;
+
+
+        // $this->startLoop($smartContracts, $isInfinite);
+
+
+    }
+
+    public function prepare()
+    {
+
+        $sandra = SandraManager::getSandra();
+
+
+        //Then we process blocks from the lowest block of those contracts
+
+        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
+        $contractFactory->populateLocal();
+        /**@var BlockchainContractFactory $contractFactory */
+        $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
+
+        foreach ($contractFactory->entityArray as $contract) {
+
+            /** @var EthereumContract $contract */
+
+            $abi = json_decode($contract->getAbi());
+            $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
+            echo PHP_EOL."address is $contractAddress";
+            if (!is_array($abi)){
+
+                echo PHP_EOL."no ABI found for $contractAddress";
+                continue;
+            }
+
+            try {
+
+                $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3, $this->rpcProvider, $contract);
+
+                $smartContracts[] = $smartContract;
+            } catch (\Exception $exception) {
+
+                throw new $exception;
+            }
+
+            $abi = null;
+
+
+        }
+
+
+        return $smartContracts ;
 
 
     }
