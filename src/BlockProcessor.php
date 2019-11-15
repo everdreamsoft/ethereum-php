@@ -215,20 +215,7 @@ class BlockProcessor
         } catch (\Exception $exception) {
 
             echo $exception->getMessage();
-
-        }
-
-        if ($this->persistStream) {
-
-            echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
-
-            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
-            $liveFactory->populateLocal();
-            $liveData = $liveFactory->last("sync", $this->persistStream);
-
-            if ($liveData) {
-                $liveData->createOrUpdateRef('lastBlock', $to);
-            }
+            throw new $exception;
         }
 
 
@@ -267,26 +254,24 @@ class BlockProcessor
             $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
             echo "finished syncing {$iterations} blocks ({from} to {to}) to block $persistant\n";
 
+            if ($this->persistStream) {
 
+                echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
+
+                $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+                $liveFactory->populateLocal();
+                $liveData = $liveFactory->last("sync", $this->persistStream);
+
+                if ($liveData) {
+                    $liveData->createOrUpdateRef('lastBlock', $to);
+                }
+            }
 
 
         } catch (\Exception $exception) {
 
             echo $exception->getMessage();
-
-        }
-
-        if ($this->persistStream) {
-
-            echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
-
-            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
-            $liveFactory->populateLocal();
-            $liveData = $liveFactory->last("sync", $this->persistStream);
-
-            if ($liveData) {
-                $liveData->createOrUpdateRef('lastBlock', $to);
-            }
+            throw new $exception;
         }
 
 
