@@ -215,7 +215,20 @@ class BlockProcessor
         } catch (\Exception $exception) {
 
             echo $exception->getMessage();
-            throw new $exception;
+
+        }
+
+        if ($this->persistStream) {
+
+            echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
+
+            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+            $liveFactory->populateLocal();
+            $liveData = $liveFactory->last("sync", $this->persistStream);
+
+            if ($liveData) {
+                $liveData->createOrUpdateRef('lastBlock', $to);
+            }
         }
 
 
@@ -260,7 +273,7 @@ class BlockProcessor
         } catch (\Exception $exception) {
 
             echo $exception->getMessage();
-            throw new $exception;
+
         }
 
         if ($this->persistStream) {
