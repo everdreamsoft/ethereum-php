@@ -49,6 +49,7 @@ class BlockProcessor
     public $sandra = null;
     public $persistStream = null; // the stream is the name of the variable in the database where we persist the last synched block
     public $bypassKnownTx = true; // the stream is the name of the variable in the database where we persist the last synched block
+    public $lastValidProcessedBlock = 0;
 
     public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
@@ -133,7 +134,7 @@ class BlockProcessor
         $this->start($smartContracts,$iterations);
 
 
-       // $this->startLoop();
+        // $this->startLoop();
 
 
     }
@@ -254,6 +255,7 @@ class BlockProcessor
             $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
             echo "finished syncing {$iterations} blocks ({from} to {to}) to block $persistant\n";
 
+
             if ($this->persistStream) {
 
                 echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
@@ -269,6 +271,18 @@ class BlockProcessor
 
 
         } catch (\Exception $exception) {
+
+
+
+            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+            $liveFactory->populateLocal();
+            $liveData = $liveFactory->last("sync", $this->persistStream);
+
+            if ($liveData && $this->lastValidProcessedBlock) {
+                $liveData->createOrUpdateRef('lastBlock', $this->lastValidProcessedBlock);
+                echo PHP_EOL. "lastBlock saved".$this->lastValidProcessedBlock  ;
+            }
+
 
             echo $exception->getMessage();
             throw new $exception;

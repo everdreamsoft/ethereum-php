@@ -28,6 +28,7 @@ class ContractEventProcessor extends BlockProcessor {
     /* @var \Ethereum\SmartContract[] $contracts */
     private $contracts;
     private $processor ;
+    private $txConceptId ;
 
     /**
      * BlockProcessor constructor.
@@ -81,7 +82,13 @@ class ContractEventProcessor extends BlockProcessor {
 
         echo '### Block number ' . $block->number->val() ;
         echo " memory ".memory_get_usage() . PHP_EOL;
-        $txidConcept = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName) ;
+        if (!$this->txConceptId) {
+            $this->txConceptId = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName);
+        }
+
+
+
+        $txidConcept = $this->txConceptId ;
 
         //print_r($this->contracts);
 
@@ -221,6 +228,8 @@ class ContractEventProcessor extends BlockProcessor {
                 }
             }
         }
+
+        $this->processor->lastValidProcessedBlock = $block->number->val();
 
     }
 
