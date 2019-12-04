@@ -11,7 +11,7 @@
     "digitaldonkey/ecverify":"1.0",
     "react/event-loop": "^1.0",
     "react/stream": "^1.0",
-    "everdreamsoft/crystal-spark-cannon": "dev-rc1"
+    "everdreamsoft/crystal-spark-cannon": "dev-unstable"
   },
   "scripts": {
     "generate-methods": [
