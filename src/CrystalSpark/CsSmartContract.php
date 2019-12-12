@@ -79,7 +79,7 @@ class CsSmartContract extends SmartContract
 
             $ownerAddress = $this->rpcProvider->ownerOf($this->csEntity,$tokenId,$standard);
             $addressFactory = $this->csEntity->getBlockchain()->getAddressFactory();
-            $address = $addressFactory->get($ownerAddress);
+            $address = $addressFactory->get($ownerAddress,true);
 
 
 
@@ -108,7 +108,7 @@ class CsSmartContract extends SmartContract
                     $additionNalMeta = $standard->getSpecifierData();
 
 
-                    $assetFactory->create($this->getAddress() . '-' . $tokenId, $metaData, $collection, array($this->csEntity->subjectConcept->idConcept => $additionNalMeta));
+                    $assetFactory->create($this->getAddress() . '-' . $tokenId, $metaData, array($collection), array($this->csEntity->subjectConcept->idConcept => $additionNalMeta));
 
                 }
             }

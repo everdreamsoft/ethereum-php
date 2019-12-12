@@ -63,7 +63,7 @@ class PathedERC721Test extends \PHPUnit\Framework\TestCase
 
        $this->assertEquals('0xe99f9adcc738f0b0fde2a12c85be9c8e0f32c252d8554e47bdadc7490e6e091a',$firstTransaction[\CsCannon\Blockchains\BlockchainEvent::DISPLAY_TXID]);
        $this->assertEquals('0x0000000000000000000000000000000000000000',$firstTransaction[\CsCannon\Blockchains\BlockchainEvent::DISPLAY_SOURCE_ADDRESS]);
-       $this->assertEquals('0xe99f9adcc738f0b0fde2a12c85be9c8e0f32c252d8554e47bdadc7490e6e091a',$firstTransaction[CsCannon\Blockchains\BlockchainEvent::DISPLAY_DESTINATION_ADDRESS]);
+       $this->assertEquals('0xf5f66fc02a2f8a32613b8e4b8d1eb0e2502d0fb4',$firstTransaction[CsCannon\Blockchains\BlockchainEvent::DISPLAY_DESTINATION_ADDRESS]);
        $this->assertEquals('1',$firstTransaction[Blockchains\BlockchainEvent::DISPLAY_QUANTITY]);
        $this->assertEquals('https://cryptocarto.herokuapp.com/token/48876200023253',$orb['imageUrl']);
 
@@ -74,7 +74,7 @@ class PathedERC721Test extends \PHPUnit\Framework\TestCase
         $events = $eventFactory->populateLocal();
 
         //we should have only 2 events make sure the tx has not been saved twice
-        $this->assertCount(2,$events);
+        $this->assertCount(1,$events);
 
 
 

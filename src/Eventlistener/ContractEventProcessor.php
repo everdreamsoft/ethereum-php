@@ -191,7 +191,7 @@ class ContractEventProcessor extends BlockProcessor {
                                 catch (\Exception $e){
 
                                     echo"Exception ".$e->getMessage();
-                                   echo $this->web3->debugHtml;
+                                   //echo $this->web3->debugHtml;
                                    //die();
 
                                 }
