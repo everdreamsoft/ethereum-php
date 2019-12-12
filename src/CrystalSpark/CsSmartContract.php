@@ -67,7 +67,7 @@ class CsSmartContract extends SmartContract
 
     }
 
-    public function ownerOf($tokenId, BlockchainBlock $atBlock){
+    public function ownerOf($tokenId, BlockchainBlock $atBlock, BlockchainAddress $previousOwner = null){
 
 
 
@@ -87,6 +87,13 @@ class CsSmartContract extends SmartContract
             $balance = new Balance($address);
             $balance->addContractToken($this->csEntity,$standard,1);
             $balance->saveToDatagraph($atBlock);
+
+            if ($previousOwner) {
+                $balancePreviousOnwer = new Balance($previousOwner);
+                $balancePreviousOnwer->addContractToken($this->csEntity,$standard,0);
+                $balancePreviousOnwer->saveToDatagraph($atBlock);
+
+                }
 
             //temporary for champ
             if($this->getAddress() == '0x1f49e1d2a4691e4514ae91bc3040767cf344ad82') {

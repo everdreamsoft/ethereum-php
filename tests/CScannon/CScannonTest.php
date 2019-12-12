@@ -82,6 +82,56 @@ class CScannonTest extends \PHPUnit\Framework\TestCase
 
     }
 
+    public function testBalanceUpdate(){
+
+        define('PROJECT_ROOT', dirname(dirname(__FILE__)));
+
+        ini_set('display_errors', 1);
+        ini_set('display_startup_errors', 1);
+        error_reporting(E_ALL);
+
+        $sandra = new \SandraCore\System('newState',1);
+
+
+        CsCannon\SandraManager::setSandra($sandra);
+        $provider = new \CsCannon\Blockchains\Klaytn\KlaytnCypress('');
+        $provider->csCaverPath =  PROJECT_ROOT .'/../../crystalControlCenter/public/caver/';
+
+        $contractFactory = new \CsCannon\Blockchains\Klaytn\KlaytnContractFactory();
+
+        $contract = $contractFactory->get('0xf4bc8ccb22e3c1466df53bbd2dc94c03ec4c300f', true,\CsCannon\Blockchains\Ethereum\Interfaces\ERC721::init());
+
+        $myProcessor = new \Ethereum\BlockProcessor($provider,$sandra,
+            14703154);
+
+
+
+        //$myProcessor = new \Ethereum\BlockProcessor($provider,$sandra,
+          //  14511747);
+
+
+
+        $addressFactory = new Blockchains\Klaytn\KlaytnAddressFactory();
+        $addressOfPreviousOwner = $addressFactory->get('0x90303ec76edcb9b36d8b47a9122fe740e6c822e6',true);
+        //$addressOfNewOwner = $addressFactory->get('0xf5f66fc02a2f8a32613b8e4b8d1eb0e2502d0fb4');
+
+       $tokenBalance =  $addressOfPreviousOwner->getBalance()->getTokenBalance();
+        //$addressOfNewOwner->getBalance()->getTokenBalance();
+
+
+        $myProcessor->trackContract($contractFactory);
+        $myProcessor->process(2);
+
+
+
+
+
+
+
+
+    }
+
+
 
 
 

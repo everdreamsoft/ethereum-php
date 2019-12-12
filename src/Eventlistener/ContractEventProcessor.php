@@ -182,7 +182,8 @@ class ContractEventProcessor extends BlockProcessor {
 
                                     if ($standard instanceof ERC721) {
 
-                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock);
+                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
+
                                         $standard->setTokenId($tokenIdString);
                                         $quantity = 1 ;
                                     }
