@@ -32,7 +32,7 @@ class ContractEventProcessor extends BlockProcessor {
 
     /**
      * BlockProcessor constructor.
-     *
+
      * @param Ethereum $web3
      *
      * @param  \Ethereum\SmartContract[] $contracts
@@ -56,13 +56,13 @@ class ContractEventProcessor extends BlockProcessor {
      * @throws \Exception
      */
     public function __construct(
-      Ethereum $web3,
-      array $contracts,
-      \Ethereum\BlockProcessor $processor,
-      $fromBlockNumber = null,
-      $toBlockNumber = null,
-      ?bool $persistent = false,
-      ?float $timePerLoop = 0.01
+        Ethereum $web3,
+        array $contracts,
+        \Ethereum\BlockProcessor $processor,
+        $fromBlockNumber = null,
+        $toBlockNumber = null,
+        ?bool $persistent = false,
+        ?float $timePerLoop = 0.01
     )
     {
         // Add contracts.
@@ -102,13 +102,15 @@ class ContractEventProcessor extends BlockProcessor {
                     $contract = $this->contracts[$tx->to->hexVal()];
                     $receipt = $this->web3->eth_getTransactionReceipt($tx->hash);
 
+
+
                     if (count($receipt->logs)) {
                         foreach ($receipt->logs as $filterChange) {
                             $event = $contract->processLog($filterChange,$this->contracts);
                             if (is_null($event)) continue ;
 
                             echo"processing".$event->getName(), "\n";
-                              //  $assetCollection = new AssetCollectionFactory();
+                            //  $assetCollection = new AssetCollectionFactory();
 
                             if ($event->hasData() && $event->getName() == 'Transfer') {
                                 echo"Transfer found".$event->getName(), "\n";
@@ -161,7 +163,8 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 //ETHQ
                                 /** @var EthQ $tokenId */
-                                if (isset($eventData['tokenId'])) {
+                                if (isset($eventData['tokenId']) or isset($eventData['_tokenId']) ) {
+                                    if (isset($eventData['_tokenId'])) $eventData['tokenId'] = $eventData['_tokenId'];
                                     $tokenId = $eventData['tokenId'] ;
                                     $tokenIdString = $tokenId->val();
                                     echo" with token ID = ".$tokenIdString."\n";
@@ -172,28 +175,30 @@ class ContractEventProcessor extends BlockProcessor {
                                 try{
 
                                     $standard =$contract->csEntity->getStandard();
-                                   echo PHP_EOL. " we have a standasrd". $standard->getStandardName();
+                                    echo PHP_EOL. " we have a standasrd". $standard->getStandardName();
 
-                                   if ($standard instanceof ERC20) {
+                                    if ($standard instanceof ERC20) {
 
-                                      $contract->getBalance($fromEntity, $sandraBlock);
-                                       $contract->getBalance($toEntity, $sandraBlock);
-                                   }
+                                        $contract->getBalance($fromEntity, $sandraBlock);
+                                        $contract->getBalance($toEntity, $sandraBlock);
+                                    }
 
                                     if ($standard instanceof ERC721) {
 
-                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
-
                                         $standard->setTokenId($tokenIdString);
                                         $quantity = 1 ;
+
+                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
+
+
                                     }
 
                                 }
                                 catch (\Exception $e){
 
                                     echo"Exception ".$e->getMessage();
-                                   //echo $this->web3->debugHtml;
-                                   //die();
+                                    //echo $this->web3->debugHtml;
+                                    //die();
 
                                 }
 
@@ -211,7 +216,7 @@ class ContractEventProcessor extends BlockProcessor {
 
 
 
-                                 $block->timestamp->val(),$sandraBlock,$standard,$quantity );
+                                    $block->timestamp->val(),$sandraBlock,$standard,$quantity );
 
 
 

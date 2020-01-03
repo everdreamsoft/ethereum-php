@@ -11,6 +11,7 @@ namespace Ethereum;
 
 use CsCannon\Blockchains\BlockchainContractFactory;
 use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
+use CsCannon\Blockchains\Interfaces\UnknownStandard;
 use CsCannon\Blockchains\Klaytn\KlaytnContractFactory;
 use CsCannon\Blockchains\RpcProvider;
 use CsCannon\SandraManager;
@@ -50,6 +51,7 @@ class BlockProcessor
     public $persistStream = null; // the stream is the name of the variable in the database where we persist the last synched block
     public $bypassKnownTx = true; // the stream is the name of the variable in the database where we persist the last synched block
     public $lastValidProcessedBlock = 0;
+    public $contractFactory = null ;
 
     public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
@@ -73,9 +75,16 @@ class BlockProcessor
 
 //ins't it already populated ?
         $contractList = $contractFactory->populateLocal();
+        $this->contractFactory = $contractFactory ;
 
 
         foreach ($contractList as $contractEntity) {
+
+            $id = $contractEntity->get('id');
+
+
+            echo " tracking contract id $id" . PHP_EOL;
+
 
             $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
             $abi = $contractEntity->getAbi();
@@ -87,7 +96,10 @@ class BlockProcessor
             //we will look for the abi in etherscan
             if (!$abi) {
 
+
+
                 $standard = $contractEntity->getStandard();
+                if ($standard instanceof UnknownStandard)continue ;
 
 
                 $client = new Client();
@@ -307,7 +319,7 @@ class BlockProcessor
 
         //Then we process blocks from the lowest block of those contracts
 
-        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
+        $contractFactory = $this->contractFactory ;
         $contractFactory->populateLocal();
         /**@var BlockchainContractFactory $contractFactory */
         $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
@@ -316,7 +328,13 @@ class BlockProcessor
 
             /** @var EthereumContract $contract */
 
-            $abi = json_decode($contract->getAbi());
+            if (!$abi = json_decode($contract->getAbi())){
+                echo PHP_EOL."Invalid ABI for ocntract".$contract->getId().PHP_EOL;
+                continue ;
+
+            }
+
+
             $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
             echo PHP_EOL."address is $contractAddress";
             if (!is_array($abi)){
