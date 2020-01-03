@@ -10,6 +10,8 @@ use CsCannon ;
 use CsCannon\Blockchains ;
 use CsCannon\Blockchains\Ethereum\DataSource\InfuraProvider;
 use Ethereum\CrystalSpark\CsSmartContract;
+use Ethereum\DataType\EthB;
+use Ethereum\DataType\EthBlockParam;
 use Ethereum\Ethereum;
 
 class GetPastEventsTest extends \PHPUnit\Framework\TestCase
@@ -54,7 +56,36 @@ class GetPastEventsTest extends \PHPUnit\Framework\TestCase
 
         }
 
-        $smartContract->getPastEvents('Transfer',12199610);
+        $block = $web3->eth_getBlockByNumber(
+            new EthBlockParam(1111111),
+            new EthB(true) // Request TX data.
+        );
+
+        $blockParam = new EthBlockParam(
+            8862402);
+
+        $blockParam1 = new EthBlockParam(
+            8918008);
+
+        $ethB = new EthB(TRUE);
+        $myBlockParam =  new EthBlockParam(8862402) ;
+        $myBlockParam2 =  new EthBlockParam(8862403) ;
+        //$block_latest = $web3->eth_getBlockByNumber($myBlockParam, $ethB);
+
+        $filterChange = new \Ethereum\DataType\FilterChange();
+        //$topic = new Ethereum
+       // $filter = new \Ethereum\DataType\Filter($blockParam,$blockParam1);
+        $filter = new \Ethereum\DataType\Filter($myBlockParam,null,new \Ethereum\DataType\EthBytes('0x6EbeAf8e8E946F0716E6533A6f2cefc83f60e8Ab'),array('Transfer'));
+       // $eij = $web3->eth_getLogs($filter);
+        $eij = $web3->eth_getLogs($filter);
+
+        foreach ($eij as $filterChange) {
+            $event = $smartContract->processLog($filterChange);
+        }
+
+        die();
+        $filterChange->address = $smartContract->address ;
+        $shaban = $smartContract->processLog($filterChange);
 
         /*const CryptoCartoContract = deployedAbi
             && smartContractAddress

@@ -36,7 +36,7 @@ class SmartContract
      * @var $events
      * Contract Events array in the form $events[<topic hex>]= \Ethereum\EmittedEvent.
      */
-    protected $events;
+    public $events;
 
 
     /**

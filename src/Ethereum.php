@@ -286,7 +286,7 @@ class Ethereum extends EthereumStatic implements Web3Interface
         elseif (!$is_primitive) {
 
             if ($array_val) {
-                if ($method === 'eth_getFilterChanges') {
+                if ($method === 'eth_getFilterChanges' or $method === 'eth_getLogs') {
                     // Only be [FilterChange| D32]
                     $return = $this->handleFilterChangeValues($value);
                 }
