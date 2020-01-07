@@ -26,6 +26,7 @@ use Ethereum\Sandra\EthereumContract;
 use Ethereum\Sandra\EthereumContractFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use mysql_xdevapi\Exception;
 use SandraCore\DatabaseAdapter;
 use SandraCore\EntityFactory;
 use SandraCore\System;
@@ -103,6 +104,7 @@ class BlockProcessor
 
 
                 $client = new Client();
+                /*
                 try {
                     $strJsonFileContents = $standard->getInterfaceAbi();
 
@@ -125,6 +127,7 @@ class BlockProcessor
 
                     $contractEntity->setAbi(json_encode($saveAbi));
                 }
+                */
             }
 
 
@@ -334,9 +337,23 @@ class BlockProcessor
 
             }
 
-
+            $standard = $contract->getStandard();
             $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
+
+
             echo PHP_EOL."address is $contractAddress";
+
+
+            if($standard){
+                echo PHP_EOL."Standard For".$standard->getStandardName().PHP_EOL;
+
+            }
+            else{
+                echo PHP_EOL."Contract has no standards".PHP_EOL;
+                continue ;
+            }
+
+
             if (!is_array($abi)){
 
                 echo PHP_EOL."no ABI found for $contractAddress";
@@ -358,6 +375,8 @@ class BlockProcessor
 
 
         }
+
+        //  throw new \Exception("exit exeption");
 
 
         return $smartContracts ;

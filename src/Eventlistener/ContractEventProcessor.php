@@ -80,8 +80,12 @@ class ContractEventProcessor extends BlockProcessor {
      */
     protected function processBlock(?Block $block) {
 
+
+
+        //echo convert(memory_get_usage(true)); // 123 kb
+
         echo '### Block number ' . $block->number->val() ;
-        echo " memory ".memory_get_usage() . PHP_EOL;
+        echo " memory ".$this->convert(memory_get_usage()) . PHP_EOL;
         if (!$this->txConceptId) {
             $this->txConceptId = $this->processor->sandra->conceptFactory->getConceptFromShortnameOrId(Blockchain::$txidConceptName);
         }
@@ -220,7 +224,7 @@ class ContractEventProcessor extends BlockProcessor {
 
 
 
-                                echo"hello Transfer $from to $to ";
+                                echo PHP_EOL."Transfer $from to $to ".PHP_EOL;
 
 
 
@@ -251,6 +255,13 @@ class ContractEventProcessor extends BlockProcessor {
             unset($contracts[$i]);
         }
         return $contracts;
+    }
+
+    //memory
+    function convert($size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
 
 }
