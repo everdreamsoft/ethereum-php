@@ -46,13 +46,13 @@ class BlockProcessor {
      * @throws \Exception
      */
     public function __construct(
-      Ethereum $web3,
-      callable $callback,
-      \Ethereum\BlockProcessor $processor,
-      $fromBlockNumber = null,
-      $toBlockNumber = null,
-      ?bool $persistent = false,
-      ?float $timePerLoop = 0.01
+        Ethereum $web3,
+        callable $callback,
+        \Ethereum\BlockProcessor $processor,
+        $fromBlockNumber = null,
+        $toBlockNumber = null,
+        ?bool $persistent = false,
+        ?float $timePerLoop = 0.01
     )
     {
         $this->web3 = $web3;
@@ -97,16 +97,28 @@ class BlockProcessor {
         $nextBlock = $this->fromBlockNumber;
         $updateCounter = array($this, 'updateCounter');
 
+
+
+
         $this->loop->addPeriodicTimer($this->timePerLoop , function() use (&$nextBlock, &$callback, &$updateCounter) {
 
             // @see https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber
             $block = $this->web3->eth_getBlockByNumber(
-              new EthBlockParam($nextBlock),
-              new EthB(true) // Request TX data.
+                new EthBlockParam($nextBlock),
+                new EthB(true) // Request TX data.
             );
             if (!is_null($block)) {
                 call_user_func($callback, $block);
                 $nextBlock = call_user_func($updateCounter, $block->number->val());
+            }
+            else{
+                //Shaban
+                //we might caught up with the blcocks or there is an error
+                //TODO find a better solution
+                echo"There is no future block slowing down".PHP_EOL ;
+                sleep(15);
+                //$this->timePerLoop = 10 ;
+
             }
 
             if ($nextBlock === FALSE) {
@@ -126,10 +138,10 @@ class BlockProcessor {
             return;
         }
         if (
-          ($this->increment && $this->fromBlockNumber <= $this->toBlockNumber) ||
-          (!$this->increment && $this->fromBlockNumber >= $this->toBlockNumber)
+            ($this->increment && $this->fromBlockNumber <= $this->toBlockNumber) ||
+            (!$this->increment && $this->fromBlockNumber >= $this->toBlockNumber)
         ) {
-           return;
+            return;
         }
         throw new \Exception('Check your counting logic.');
     }
@@ -216,8 +228,8 @@ class BlockProcessor {
     {
         $file = self::persistenceFile();
         if (
-          (file_exists($file) && !is_writable($file)) ||
-          file_put_contents($file, (string) $blockNumber) === FALSE
+            (file_exists($file) && !is_writable($file)) ||
+            file_put_contents($file, (string) $blockNumber) === FALSE
         ) {
             throw new \Exception('Can not write temp file.');
         }
@@ -265,8 +277,8 @@ class BlockProcessor {
         }
         else {
             if (
-              ($this->increment && $nextBlock > $this->toBlockNumber) ||
-              (!$this->increment && $nextBlock < $this->toBlockNumber)
+                ($this->increment && $nextBlock > $this->toBlockNumber) ||
+                (!$this->increment && $nextBlock < $this->toBlockNumber)
             ) {
                 $nextBlock = FALSE; // Will end the loop.
                 if ($this->isPersistent) {

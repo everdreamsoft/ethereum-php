@@ -1,300 +1,387 @@
 <?php
+/**
+ * Created by EverdreamSoft.
+ * User: Shaban Shaame
+ * Date: 2019-07-05
+ * Time: 09:56
+ */
 
-namespace Ethereum\Eventlistener;
+namespace Ethereum;
 
-use Ethereum\Ethereum;
-use React\EventLoop\Factory as EventLoopFactory;
-use Ethereum\DataType\EthBlockParam;
+
+use CsCannon\Blockchains\BlockchainContractFactory;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
+use CsCannon\Blockchains\Interfaces\UnknownStandard;
+use CsCannon\Blockchains\Klaytn\KlaytnContractFactory;
+use CsCannon\Blockchains\RpcProvider;
+use CsCannon\SandraManager;
+
+use Ethereum\CrystalSpark\CsSmartContract;
 use Ethereum\DataType\EthB;
+use Ethereum\DataType\EthBlockParam;
+use Ethereum\DataType\FilterChange;
+use Ethereum\Eventlistener\BlockchainToDatagraph;
+use Ethereum\Eventlistener\ContractEventProcessor;
+use Ethereum\Sandra\EthereumContract;
+use Ethereum\Sandra\EthereumContractFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use mysql_xdevapi\Exception;
+use SandraCore\DatabaseAdapter;
+use SandraCore\EntityFactory;
+use SandraCore\System;
 
-class BlockProcessor {
 
-    /* @var \Ethereum\Ethereum $web3 */
-    protected $web3;
-    public $fromBlockNumber;
-    public $toBlockNumber;
-    protected $increment;
+class CallableEvents extends SmartContract {
+    public function onCalledTrigger1 (EthEvent $event) {
+        echo '### ' . substr(__FUNCTION__, 2) . "(\Ethereum\EmittedEvent)\n";
+        var_dump($event);
+    }
+    public function onCalledTrigger2 (EthEvent $event) {
+        echo '### ' . substr(__FUNCTION__, 2) . "(\Ethereum\EmittedEvent)\n";
+        var_dump($event);
+    }
+}
 
-    protected $isInfinite;
-    protected $isPersistent;
+class BlockProcessor
+{
 
-    private $timePerLoop;
-    /* @var \React\EventLoop\LoopInterface $loop */
-    private $loop;
+    public $rpcProvider = null;
+    public $fromBlockNumber = null;
+    public $sandra = null;
+    public $persistStream = null; // the stream is the name of the variable in the database where we persist the last synched block
+    public $bypassKnownTx = true; // the stream is the name of the variable in the database where we persist the last synched block
+    public $lastValidProcessedBlock = 0;
+    public $contractFactory = null ;
 
-    /**
-     * BlockProcessor constructor.
-     *
-     * @param Ethereum $web3
-     *
-     * @param callable $callback
-     *   This function will be called at each block.
-     *
-     * @param int $fromBlockNumber
-     *
-     * @param int|null $toBlockNumber
-     *   Will default to latest at script start time or Block or 0.
-     *
-     * @param bool $persistent
-     *   Make sure we can resume with latest block after script restart.
-     *
-     * @param float $timePerLoop
-     *   Time for each request in seconds.
-     *    - Use for throttling or adjust to BlockTime for continuous evaluation.
-     *    - If processing takes more time, lowering this value won't help.
-     *
-     * @throws \Exception
-     */
-    public function __construct(
-        Ethereum $web3,
-        callable $callback,
-        \Ethereum\BlockProcessor $processor,
-        $fromBlockNumber = null,
-        $toBlockNumber = null,
-        ?bool $persistent = false,
-        ?float $timePerLoop = 0.01
-    )
+    public function __construct(RpcProvider $provider, System $sandra, $fromBlockNumber = 0)
     {
-        $this->web3 = $web3;
 
-        // Int || 'latest'
-        $this->isInfinite = self::isInfinite($toBlockNumber);
-
-        // $fromBlockNumber integer || null --> Block 0  || 'latest' -> current block
-        $fromBlockNumber = $this->startBlock($fromBlockNumber);
-
-        $this->toBlockNumber = $this->endBlock($toBlockNumber);
-
-        $this->increment = $this->upOrDown($fromBlockNumber);
-
-        if ($persistent) {
-            $fromBlockNumber = $this->checkPersistency($fromBlockNumber);
-        }
-
+        $this->rpcProvider = $provider;
         $this->fromBlockNumber = $fromBlockNumber;
+        SandraManager::setSandra($sandra);
+        $this->sandra = $sandra;
 
-
-        $this->timePerLoop = $timePerLoop;
-
-        $this->isPersistent = $persistent;
-
-
-        // Validate input.
-        self::verifyCountLogic();
-        $this->runLoop($callback);
 
     }
 
 
-    /**
-     * Run the Loop.
-     *
-     * @param callable $callback
-     */
-    private function runLoop (callable $callback) {
-        $this->loop = EventLoopFactory::create();
+    public function trackContract(BlockchainContractFactory $contractFactory, $abiArray = null)
+    {
 
-        $nextBlock = $this->fromBlockNumber;
-        $updateCounter = array($this, 'updateCounter');
+        $sandra = SandraManager::getSandra();
 
 
 
 
-        $this->loop->addPeriodicTimer($this->timePerLoop , function() use (&$nextBlock, &$callback, &$updateCounter) {
+//ins't it already populated ?
+        $contractList = $contractFactory->populateLocal();
+        $this->contractFactory = $contractFactory ;
 
-            // @see https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getblockbynumber
-            $block = $this->web3->eth_getBlockByNumber(
-                new EthBlockParam($nextBlock),
-                new EthB(true) // Request TX data.
-            );
-            if (!is_null($block)) {
-                call_user_func($callback, $block);
-                $nextBlock = call_user_func($updateCounter, $block->number->val());
+
+        foreach ($contractList as $contractEntity) {
+
+            $id = $contractEntity->get('id');
+
+
+            echo " tracking contract id $id" . PHP_EOL;
+
+
+            $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
+            $abi = $contractEntity->getAbi();
+
+
+            //do we have a related abi
+
+
+            //we will look for the abi in etherscan
+            if (!$abi) {
+
+
+
+                $standard = $contractEntity->getStandard();
+                if ($standard instanceof UnknownStandard)continue ;
+
+
+                $client = new Client();
+                /*
+                try {
+                    $strJsonFileContents = $standard->getInterfaceAbi();
+
+
+
+                    $result = json_decode($strJsonFileContents);
+                    $abiRaw = $result;
+                    $abiRefined = $abiRaw;
+                    $abi = $abiRefined;
+                    $saveAbi = $abiRefined;
+
+                    // $abi = stripslashes($abi);
+                } catch (ClientException  $e) {
+                    $abi = null;
+
+                }
+
+
+                if ($abi) {
+
+                    $contractEntity->setAbi(json_encode($saveAbi));
+                }
+                */
+            }
+
+
+
+
+
+
+        }
+
+
+    }
+
+    public function process($iterations=1000)
+    {
+
+        // First we get tracked contracts
+
+        $smartContracts = $this->prepare();
+        $this->start($smartContracts,$iterations);
+
+
+        // $this->startLoop();
+
+
+    }
+
+    public function startLoop($isInfinite = true)
+    {
+
+        $sandra = SandraManager::getSandra();
+
+        $restartAfterBlocks = 1000;
+
+        //
+
+
+        //Then we process blocks from the lowest block of those contracts
+
+        $contractFactory = $this->rpcProvider->getBlockchain()->getContractFactory();
+        $contractFactory->populateLocal();
+        /**@var BlockchainContractFactory $contractFactory */
+        $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
+
+        foreach ($contractFactory->entityArray as $contract) {
+
+            /** @var EthereumContract $contract */
+
+            $abi = json_decode($contract->getAbi());
+            $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
+            echo "address is $contractAddress";
+            if (!is_array($abi)) continue;
+
+            try {
+
+                $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3, $this->rpcProvider, $contract);
+
+                $smartContracts[] = $smartContract;
+            } catch (\Exception $exception) {
+
+                throw new $exception;
+            }
+
+            $abi = null;
+
+
+        }
+
+
+        try {
+            $sandra = SandraManager::getSandra();
+
+            $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+            $networkId = '5777';
+
+            $persistant = false;
+            if ($this->fromBlockNumber == 'latest') $persistant = true;
+
+
+            // By default ContractEventProcessor
+            // process any Transaction from Block-0 to latest Block (at script run time).
+            $from = $this->fromBlockNumber;
+            $to = $this->fromBlockNumber + $restartAfterBlocks;
+            $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
+            echo "finished syncing {$restartAfterBlocks} blocks ({from} to {to})\n";
+
+            if ($this->persistStream) {
+
+                echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
+
+                $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+                $liveFactory->populateLocal();
+                $liveData = $liveFactory->last("sync", $this->persistStream);
+
+                if ($liveData) {
+                    $liveData->createOrUpdateRef('lastBlock', $to);
+                }
+            }
+
+
+        } catch (\Exception $exception) {
+
+            echo $exception->getMessage();
+            throw new $exception;
+        }
+
+
+        //echo "\n restarting lookp";
+        //sleep(2);
+        //$this->fromBlockNumber = $contractProcessor->toBlockNumber ;
+
+
+        // $this->startLoop($smartContracts, $isInfinite);
+
+
+    }
+
+    public function start($smartContracts,$iterations)
+    {
+
+        echo "Starting from block $this->fromBlockNumber  with iteration:$iterations".PHP_EOL;
+
+
+
+        try {
+            $sandra = SandraManager::getSandra();
+
+            $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+            $networkId = '5777';
+
+            $persistant = false;
+            if ($this->fromBlockNumber == 'latest') $persistant = true;
+
+
+            // By default ContractEventProcessor
+            // process any Transaction from Block-0 to latest Block (at script run time).
+            $from = $this->fromBlockNumber;
+            $to = $this->fromBlockNumber + $iterations;
+            echo "To Block $to".PHP_EOL;
+            $contractProcessor = new ContractEventProcessor($web3, $smartContracts, $this, $from, $to, $persistant);
+            echo "finished syncing {$iterations} blocks ({from} to {to}) to block $persistant\n";
+
+
+            if ($this->persistStream) {
+
+                echo PHP_EOL. "leaving live stream on datagraph :".$sandra->tablePrefix ."with RPC ". $this->rpcProvider->getHostUrl()  ;
+
+                $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+                $liveFactory->populateLocal();
+                $liveData = $liveFactory->last("sync", $this->persistStream);
+
+                if ($liveData) {
+                    $liveData->createOrUpdateRef('lastBlock', $to);
+                }
+            }
+
+
+        } catch (\Exception $exception) {
+
+
+
+            $liveFactory = new EntityFactory("liveSync", 'liveData', SandraManager::getSandra());
+            $liveFactory->populateLocal();
+            $liveData = $liveFactory->last("sync", $this->persistStream);
+
+            if ($liveData && $this->lastValidProcessedBlock) {
+                $liveData->createOrUpdateRef('lastBlock', $this->lastValidProcessedBlock);
+                echo PHP_EOL. "lastBlock saved".$this->lastValidProcessedBlock  ;
+            }
+
+
+            echo $exception->getMessage();
+            throw new $exception;
+        }
+
+
+        //echo "\n restarting lookp";
+        //sleep(2);
+        //$this->fromBlockNumber = $contractProcessor->toBlockNumber ;
+
+
+        // $this->startLoop($smartContracts, $isInfinite);
+
+
+    }
+
+    public function prepare()
+    {
+
+        $sandra = SandraManager::getSandra();
+
+
+        //Then we process blocks from the lowest block of those contracts
+
+        $contractFactory = $this->contractFactory ;
+        $contractFactory->populateLocal();
+        /**@var BlockchainContractFactory $contractFactory */
+        $contractFactory->populateBrotherEntities($contractFactory::ABI_VERB);
+
+        foreach ($contractFactory->entityArray as $contract) {
+
+            /** @var EthereumContract $contract */
+
+            if (!$abi = json_decode($contract->getAbi())){
+                echo PHP_EOL."Invalid ABI for ocntract".$contract->getId().PHP_EOL;
+                continue ;
+
+            }
+
+            $standard = $contract->getStandard();
+            $contractAddress = $contract->get($contractFactory::MAIN_IDENTIFIER);
+
+
+            echo PHP_EOL."address is $contractAddress";
+
+
+            if($standard){
+                echo PHP_EOL."Standard For".$standard->getStandardName().PHP_EOL;
+
             }
             else{
-                //Shaban
-                //we might caught up with the blcocks or there is an error
-                //TODO find a better solution
-                echo"There is no future block slowing down".PHP_EOL ;
-                sleep(15);
-                //$this->timePerLoop = 10 ;
-
+                echo PHP_EOL."Contract has no standards".PHP_EOL;
+                continue ;
             }
 
-            if ($nextBlock === FALSE) {
-                $this->loop->stop();
+
+            if (!is_array($abi)){
+
+                echo PHP_EOL."no ABI found for $contractAddress";
+                continue;
             }
-        });
-        $this->loop->run();
-    }
 
+            try {
 
-    /**
-     * @throws \Exception
-     */
-    protected function verifyCountLogic() {
-        // Ensure this can work.
-        if ($this->isInfinite) {
-            return;
-        }
-        if (
-            ($this->increment && $this->fromBlockNumber <= $this->toBlockNumber) ||
-            (!$this->increment && $this->fromBlockNumber >= $this->toBlockNumber)
-        ) {
-            return;
-        }
-        throw new \Exception('Check your counting logic.');
-    }
+                $web3 = new Ethereum($this->rpcProvider->getHostUrl());
+                $smartContract = new CsSmartContract($abi, $contractAddress, $web3, $this->rpcProvider, $contract);
 
+                $smartContracts[] = $smartContract;
+            } catch (\Exception $exception) {
 
-    /**
-     * @param string|int|null $lastBlock
-     * @return bool
-     * @throws \Exception
-     */
-    private static function isInfinite($lastBlock) {
-        if (!is_null($lastBlock) && $lastBlock === 'latest') {
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * @param $fromBlockNumber
-     * @param $default
-     * @return mixed
-     */
-    private function startBlock($fromBlockNumber, $default = 0) {
-        if (is_null($fromBlockNumber)) {
-            return $default;
-        }
-        if ($fromBlockNumber === 'latest') {
-            return $this->web3->eth_blockNumber()->val();
-        }
-        return $fromBlockNumber;
-    }
-
-
-    /**
-     * @param $fromBlockNumber
-     * @return bool
-     */
-    private function upOrDown($fromBlockNumber) {
-        if ($this->isInfinite) {
-            // $this->toBlockNumber == 'latest'
-            return true;
-        }
-        return ($fromBlockNumber < $this->toBlockNumber);
-
-    }
-
-
-    /**
-     * @param $toBlockNumber
-     * @return mixed
-     */
-    private function endBlock($toBlockNumber) {
-        if (is_null($toBlockNumber)) {
-            return $this->web3->eth_blockNumber()->val();
-        }
-        return $toBlockNumber;
-    }
-
-
-    /**
-     * @param $fromBlockNumber
-     * @return bool|string
-     * @throws \Exception
-     */
-    protected function checkPersistency($fromBlockNumber)
-    {
-        $file = self::persistenceFile();
-        if (file_exists($file)) {
-            $value = file_get_contents($file);
-            if ($value === false) {
-                throw new \Exception('Can not read temp file.');
+                throw new $exception;
             }
-            return $this->nextBock($value);
-        }
-        return $fromBlockNumber;
-    }
 
-    /**
-     * @param string $blockNumber
-     * @throws \Exception
-     */
-    protected function setLastBlock(string $blockNumber)
-    {
-        $file = self::persistenceFile();
-        if (
-            (file_exists($file) && !is_writable($file)) ||
-            file_put_contents($file, (string) $blockNumber) === FALSE
-        ) {
-            throw new \Exception('Can not write temp file.');
-        }
-    }
-
-    protected function persistenceDone() {
-        unlink(self::persistenceFile());
-    }
-
-    /**
-     * @return string FilePath.
-     */
-    protected static function persistenceFile() {
-        return sys_get_temp_dir() . '/' . md5(__DIR__ . __FILE__ . __CLASS__);
-    }
+            $abi = null;
 
 
-    /**
-     * @param $blockNumber
-     * @return int|null
-     * @throws \Exception
-     */
-    protected function updateCounter($blockNumber) {
-        $nextBlock = null;
-        if ($this->isPersistent) {
-            $this->setLastBlock((string) $blockNumber);
         }
 
-        // Update counter
-        $nextBlock = $this->nextBock($blockNumber);
+        //  throw new \Exception("exit exeption");
 
-        if ($this->isInfinite) {
-            // Check if there is a next block > this one before going on.
-            $latestBlockNumber = $this->web3->eth_blockNumber()->val();
-            if ($nextBlock <= $latestBlockNumber) {
-                return $nextBlock;
-            }
-            else {
-                while ($nextBlock > $latestBlockNumber) {
-                    sleep(1);
-                    $latestBlockNumber = $this->web3->eth_blockNumber()->val();
-                }
-                return $latestBlockNumber;
-            }
-        }
-        else {
-            if (
-                ($this->increment && $nextBlock > $this->toBlockNumber) ||
-                (!$this->increment && $nextBlock < $this->toBlockNumber)
-            ) {
-                $nextBlock = FALSE; // Will end the loop.
-                if ($this->isPersistent) {
-                    self::persistenceDone();
-                }
-            }
-            return $nextBlock;
-        }
+
+        return $smartContracts ;
+
+
     }
 
-
-    /**
-     * @param $currentBlock
-     * @return int
-     */
-    private function nextBock($currentBlock) {
-        return $this->increment ? $currentBlock + 1 : $currentBlock - 1;
-    }
 }
