@@ -300,7 +300,7 @@ class BlockProcessor
 
 
             echo $exception->getMessage();
-            throw new $exception;
+           // throw new $exception;
         }
 
 
