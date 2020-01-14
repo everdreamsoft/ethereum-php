@@ -129,7 +129,9 @@ class ContractEventProcessor extends BlockProcessor {
                                 //$getAddress = $ethereumAddressFactory->get($eventData['from'],true);
                                 $ethereumAddressFactory = $this->processor->rpcProvider->getBlockchain()->getAddressFactory();
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
-                                if($this->processor->bypassKnownTx && DatabaseAdapter::searchConcept($this->processor->rpcProvider->transform($txidConcept,$tx->hash->val()),$txHashUnid,$ethereumAddressFactory->system)){
+                                $transformedTx = $this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
+                                $rawTx = $tx->hash->val() ;
+                                if($this->processor->bypassKnownTx && DatabaseAdapter::searchConcept(array($rawTx,$transformedTx),$txHashUnid,$ethereumAddressFactory->system)){
                                     //we bypass known tx if set up so and if tx exists
                                     echo"tx alrady in DB bypass ".$this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
                                     continue ;
