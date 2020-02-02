@@ -6,6 +6,7 @@ use CsCannon\AssetCollectionFactory;
 use CsCannon\Blockchains\Blockchain;
 use CsCannon\Blockchains\BlockchainBlock;
 use CsCannon\Blockchains\BlockchainBlockFactory;
+use CsCannon\Blockchains\BlockchainEvent;
 use CsCannon\Blockchains\BlockchainEventFactory;
 use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
 use CsCannon\Blockchains\Ethereum\EthereumBlockchain;
@@ -170,19 +171,22 @@ class ContractEventProcessor extends BlockProcessor {
 
 
                                 try{
+                                    $txCsContract = $contract ;
+                                    $contractTest = $event->getContract();
+                                    $eventContract =  $this->contracts[$event->getContract()];
 
-                                    $standard =$contract->csEntity->getStandard();
-                                   echo PHP_EOL. " we have a standasrd". $standard->getStandardName();
+                                    $standard =$eventContract->csEntity->getStandard();
+                                    echo PHP_EOL. " we have a standasrd". $standard->getStandardName();
 
-                                   if ($standard instanceof ERC20) {
+                                    if ($standard instanceof ERC20) {
 
-                                      $contract->getBalance($fromEntity, $sandraBlock);
-                                       $contract->getBalance($toEntity, $sandraBlock);
-                                   }
+                                        $eventContract->getBalance($fromEntity, $sandraBlock);
+                                        $eventContract->getBalance($toEntity, $sandraBlock);
+                                    }
 
                                     if ($standard instanceof ERC721) {
 
-                                        $finalOwner = $contract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
+                                        $finalOwner = $eventContract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
 
                                         $standard->setTokenId($tokenIdString);
                                         $quantity = 1 ;
@@ -192,8 +196,8 @@ class ContractEventProcessor extends BlockProcessor {
                                 catch (\Exception $e){
 
                                     echo"Exception ".$e->getMessage();
-                                   //echo $this->web3->debugHtml;
-                                   //die();
+                                    //echo $this->web3->debugHtml;
+                                    //die();
 
                                 }
 
@@ -206,12 +210,12 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 $ethereumEventFactory =  $this->processor->rpcProvider->getBlockchain()->getEventFactory();
                                 $ethereumContractFactory = $this->processor->rpcProvider->getBlockchain()->getContractFactory();
-                                $sandraContract = $ethereumContractFactory->get($contract->getAddress());
-                                $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraContract,$correctedTx,
-
-
-
-                                 $block->timestamp->val(),$sandraBlock,$standard,$quantity );
+                                $sandraSourceContract = $ethereumContractFactory->get($contract->getAddress()); //this is the contract activated by sending gas
+                                $sandraEventContract = $ethereumContractFactory->get($eventContract->getAddress()); //this is the contract where the event occured
+                                $event = $ethereumEventFactory->create($blockchain,$fromEntity,$toEntity,$sandraEventContract,$correctedTx,
+                                    $block->timestamp->val(),$sandraBlock,$standard,$quantity );
+                                /** @var BlockchainEvent $event */
+                                $event->setSourceContract($sandraSourceContract);
 
 
 
