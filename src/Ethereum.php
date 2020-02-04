@@ -356,6 +356,14 @@ class Ethereum extends EthereumStatic implements Web3Interface
     public function etherRequest(string $method, array $params = [])
     {
         try {
+            //Shaban fix bug with hex starting with 0x0
+            if ($method == 'eth_getBlockByNumber'){
+                while (substr( $params[0], 0, 3 ) === "0x0") {
+
+                    $params[0]  = str_replace("0x0", "0x", $params[0]);
+                }
+            }
+
             return $this->request($method, $params);
         } catch (\Exception $e) {
             if ($e->getCode() === 405) {
