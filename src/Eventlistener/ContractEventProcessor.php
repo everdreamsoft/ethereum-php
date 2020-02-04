@@ -21,6 +21,7 @@ use Ethereum\DataType\Transaction;
 use Ethereum\Ethereum;
 use Ethereum\Sandra\EthereumContractFactory;
 use SandraCore\DatabaseAdapter;
+use SandraCore\EntityFactory;
 use SandraCore\System;
 
 class ContractEventProcessor extends BlockProcessor {
@@ -110,7 +111,29 @@ class ContractEventProcessor extends BlockProcessor {
 
                     if (count($receipt->logs)) {
                         foreach ($receipt->logs as $filterChange) {
-                            $event = $contract->processLog($filterChange,$this->contracts);
+
+                            try {
+
+                                $event = $contract->processLog($filterChange, $this->contracts);
+                            }catch (\Exception $e){
+                                echo "bypass". $tx->to->hexVal() ." because of exeption ".$e->getMessage().PHP_EOL;
+                                $errorFactory = new EntityFactory("txError",'errorFile',$this->processor->sandra);
+                                $errorExist = $errorFactory->first(Blockchain::$txidConceptName,$tx->to->hexVal());
+                                if (!$errorExist) {
+                                    $errorFactory->createNew([Blockchain::$txidConceptName => $tx->to->hexVal(),
+                                        "message"=>$e->getMessage(),
+                                        BlockchainEventFactory::EVENT_BLOCK, $blockId = $block->number->val()
+
+                                    ], [BlockchainEventFactory::EVENT_CONTRACT=>$contract->csEntity]);
+                                    echo"New ERRor saving".PHP_EOL ;
+
+                                }
+                                else   echo"ERROR exist".PHP_EOL ;
+                                continue ;
+
+
+                            }
+
                             if (is_null($event)) continue ;
 
                             echo"processing".$event->getName(), "\n";
