@@ -14,6 +14,7 @@ class BlockProcessor {
     public $fromBlockNumber;
     public $toBlockNumber;
     protected $increment;
+    public $processor ;
 
     protected $isInfinite;
     protected $isPersistent;
@@ -78,6 +79,8 @@ class BlockProcessor {
 
         $this->isPersistent = $persistent;
 
+        $this->processor = $processor ;
+
 
         // Validate input.
         self::verifyCountLogic();
@@ -98,7 +101,8 @@ class BlockProcessor {
         $updateCounter = array($this, 'updateCounter');
 
 
-
+        if ($this->processor->rpcProvider->getRequestPerSecond() > 0)
+            $this->timePerLoop = 1 / $this->processor->rpcProvider->getRequestPerSecond();
 
         $this->loop->addPeriodicTimer($this->timePerLoop , function() use (&$nextBlock, &$callback, &$updateCounter) {
 

@@ -29,7 +29,7 @@ class ContractEventProcessor extends BlockProcessor {
 
     /* @var \Ethereum\SmartContract[] $contracts */
     private $contracts;
-    private $processor ;
+
     private $txConceptId ;
 
     /**
@@ -273,6 +273,8 @@ class ContractEventProcessor extends BlockProcessor {
             }
         }
 
+
+        //sleep()
         $this->processor->lastValidProcessedBlock = $block->number->val();
 
     }

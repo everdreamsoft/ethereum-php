@@ -104,7 +104,7 @@ class BlockProcessor
 
 
                 $client = new Client();
-                /*
+
                 try {
                     $strJsonFileContents = $standard->getInterfaceAbi();
 
@@ -127,7 +127,7 @@ class BlockProcessor
 
                     $contractEntity->setAbi(json_encode($saveAbi));
                 }
-                */
+
             }
 
 

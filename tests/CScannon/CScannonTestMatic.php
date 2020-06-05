@@ -9,7 +9,7 @@
 use CsCannon ;
 use CsCannon\Blockchains ;
 
-class CScannonTest extends \PHPUnit\Framework\TestCase
+class CScannonMaticTest extends \PHPUnit\Framework\TestCase
 {
 
 
@@ -28,20 +28,22 @@ class CScannonTest extends \PHPUnit\Framework\TestCase
         $provider = new \CsCannon\Blockchains\Klaytn\KlaytnCypress('');
         $provider->csCaverPath =  PROJECT_ROOT .'/../../crystalControlCenter/public/caver/';
 
-        $contractFactory = new \CsCannon\Blockchains\Klaytn\KlaytnContractFactory();
+        $contractFactory = new Blockchains\Ethereum\Sidechains\Matic\MaticContractFactory();
 
-        $klayChamp = $contractFactory->get('0x1f49e1d2a4691e4514ae91bc3040767cf344ad82', true,\CsCannon\Blockchains\Ethereum\Interfaces\ERC721::init());
+        $contractAddress = '0x87427374a2199e317d9A50DEf8Cf23603AEE0da7'; //sog on matic testent
+
+
+
+        $collection = $contractFactory->get($contractAddress, true,\CsCannon\Blockchains\Ethereum\Interfaces\ERC721::init());
 
         $assetCollectionFactory = new \CsCannon\AssetCollectionFactory(\CsCannon\SandraManager::getSandra());
         $assetCollectionFactory->populateLocal();
-        $collectionEntity = $assetCollectionFactory->getOrCreate("KlaytnChamp");
-        $collectionEntity->setName("Klaytn Champ");
+        $collectionEntity = $assetCollectionFactory->getOrCreate("testCollection");
+        $collectionEntity->setName("Test Collection");
         $collectionEntity->setDescription("");
         $collectionEntity->setImageUrl("https://klaytn.champ.blockdevs.asia/token_img/6277101735386680763835789423207666416102355444464034512904");
         $assetCollectionFactory->populateLocal();
         $collectionEntity->setSolver(\CsCannon\AssetSolvers\LocalSolver::getEntity());
-
-        $klayChamp->bindToCollection($collectionEntity);
 
 
 
