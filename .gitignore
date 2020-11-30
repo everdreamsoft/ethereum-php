@@ -18,3 +18,4 @@ test/PrivateTestManager.php
 .LSOverride
 ._*
 
+/tests/PrivateTestManager.php

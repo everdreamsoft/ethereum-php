@@ -6,10 +6,9 @@
  * Time: 17:46
  */
 
-use CsCannon ;
 use CsCannon\Blockchains ;
 
-class CScannonMaticTest extends \PHPUnit\Framework\TestCase
+class CScannonTestMatic extends \PHPUnit\Framework\TestCase
 {
 
 
@@ -21,7 +20,7 @@ class CScannonMaticTest extends \PHPUnit\Framework\TestCase
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
 
-        PrivateTestManager::initTestDatagraph();
+
 
 
         $sandra = \CsCannon\SandraManager::getSandra();
@@ -76,11 +75,6 @@ class CScannonMaticTest extends \PHPUnit\Framework\TestCase
 
         //we should have only 2 events make sure the tx has not been saved twice
         $this->assertCount(2,$events);
-
-
-
-
-
 
     }
 
