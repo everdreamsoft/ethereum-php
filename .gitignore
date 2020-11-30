@@ -7,6 +7,7 @@ doc
 *generatedTest.php
 public
 src/test
+test/PrivateTestManager.php
 
 !docs/.gitkeep
 
