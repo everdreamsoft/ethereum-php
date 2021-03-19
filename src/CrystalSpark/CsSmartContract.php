@@ -69,9 +69,11 @@ class CsSmartContract extends SmartContract
 
     public function ownerOf($tokenId, BlockchainBlock $atBlock, BlockchainAddress $previousOwner = null){
 
+        echo get_class($this->rpcProvider);
 
 
         if (method_exists($this->rpcProvider,'ownerOf')){
+            echo "method exist".PHP_EOL;
 
             $standard = $this->csEntity->getStandard();
             $standard->setTokenId($tokenId);

@@ -6,7 +6,7 @@
  * Time: 17:46
  */
 
-use CsCannon ;
+
 use CsCannon\Blockchains ;
 use CsCannon\Blockchains\Ethereum\DataSource\InfuraProvider;
 use Ethereum\CrystalSpark\CsSmartContract;

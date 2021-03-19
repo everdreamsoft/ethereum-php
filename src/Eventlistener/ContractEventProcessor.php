@@ -12,6 +12,7 @@ use CsCannon\Blockchains\Ethereum\EthereumAddressFactory;
 use CsCannon\Blockchains\Ethereum\EthereumBlockchain;
 use CsCannon\Blockchains\Ethereum\EthereumEvent;
 use CsCannon\Blockchains\Ethereum\EthereumEventFactory;
+use CsCannon\Blockchains\Ethereum\Interfaces\ERC1155;
 use CsCannon\Blockchains\Ethereum\Interfaces\ERC20;
 use CsCannon\Blockchains\Ethereum\Interfaces\ERC721;
 use CsCannon\SandraManager;
@@ -96,7 +97,7 @@ class ContractEventProcessor extends BlockProcessor {
 
         $txidConcept = $this->txConceptId ;
 
-        //print_r($this->contracts);
+
 
         if (count($block->transactions)) {
             foreach ($block->transactions as $tx) {
@@ -137,10 +138,12 @@ class ContractEventProcessor extends BlockProcessor {
 
                             if (is_null($event)) continue ;
 
-                            echo"processing".$event->getName(), "\n";
+                            echo"processing ".$event->getName(), "\n";
                             //  $assetCollection = new AssetCollectionFactory();
 
-                            if ($event->hasData() && $event->getName() == 'Transfer') {
+
+
+                            if ($event->hasData() && ($event->getName() == 'Transfer' or $event->getName() == 'TransferSingle')) {
                                 echo"Transfer found".$event->getName(), "\n";
 
                                 //is the tx already in DB ?
@@ -155,7 +158,7 @@ class ContractEventProcessor extends BlockProcessor {
                                 $blockchain =  $this->processor->rpcProvider->getBlockchain();
                                 $transformedTx = $this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
                                 $rawTx = $tx->hash->val() ;
-                                if($this->processor->bypassKnownTx && DatabaseAdapter::searchConcept(array($rawTx,$transformedTx),$txHashUnid,$ethereumAddressFactory->system,$blockchain->getEventFactory()->entityReferenceContainer,$blockchain->getEventFactory()->entityContainedIn)){
+                                if($this->processor->bypassKnownTx && DatabaseAdapter::searchConcept($ethereumAddressFactory->system,array($rawTx,$transformedTx),$txHashUnid,$blockchain->getEventFactory()->entityReferenceContainer,$blockchain->getEventFactory()->entityContainedIn)){
                                     //we bypass known tx if set up so and if tx exists
                                     echo"tx alrady in DB bypass ".$this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
                                     continue ;
@@ -193,8 +196,9 @@ class ContractEventProcessor extends BlockProcessor {
 
                                 //ETHQ
                                 /** @var EthQ $tokenId */
-                                if (isset($eventData['tokenId']) or isset($eventData['_tokenId']) ) {
+                                if (isset($eventData['tokenId']) or isset($eventData['_tokenId'] ) or isset($eventData['_id'])) {
                                     if (isset($eventData['_tokenId'])) $eventData['tokenId'] = $eventData['_tokenId'];
+                                    if (isset($eventData['_id'])) $eventData['tokenId'] = $eventData['_id'];
                                     $tokenId = $eventData['tokenId'] ;
                                     $tokenIdString = $tokenId->val();
                                     echo" with token ID = ".$tokenIdString."\n";
@@ -219,16 +223,21 @@ class ContractEventProcessor extends BlockProcessor {
                                     if ($standard instanceof ERC721) {
 
 
-
                                         $standard->setTokenId($tokenIdString);
                                         $quantity = 1 ;
 
                                         //this should be down because can rise exeption
                                         $finalOwner = $eventContract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
+                                    }
+
+                                    if ($standard instanceof ERC1155) {
 
 
+                                        $standard->setTokenId($tokenIdString);
+                                        $quantity = $eventData['_value']->val() ;
 
-
+                                        //this should be down because can rise exeption
+                                        $finalOwner = $eventContract->ownerOf($tokenIdString,$sandraBlock,$fromEntity);
                                     }
 
                                 }
@@ -239,8 +248,6 @@ class ContractEventProcessor extends BlockProcessor {
                                     //die();
 
                                 }
-
-
 
                                 //transformations
                                 $correctedTx = $this->processor->rpcProvider->transform($txidConcept,$tx->hash->val());
